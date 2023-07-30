@@ -13,7 +13,7 @@ public class RegistrationController {
     private final UserService userService;
 
     @GetMapping("/registration")
-    public String registrationPage(){
+    public String showRegistrationPage(){
         return "auth/registration";
     }
 
@@ -29,7 +29,7 @@ public class RegistrationController {
     }
 
     @GetMapping("/login")
-    public String loginPage(){
+    public String showLoginPage(){
         return "auth/login";
     }
 }
