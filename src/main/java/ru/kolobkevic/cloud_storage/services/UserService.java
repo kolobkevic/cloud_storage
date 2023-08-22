@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import ru.kolobkevic.cloud_storage.entities.User;
 import ru.kolobkevic.cloud_storage.repositories.UserRepository;
 
-import java.util.Collections;
-
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
@@ -26,7 +24,8 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                Collections.singleton(new SimpleGrantedAuthority("USER"))
+                user.getRoles().stream().map(
+                        role -> new SimpleGrantedAuthority(role.getRoleType().name())).toList()
         );
     }
 
