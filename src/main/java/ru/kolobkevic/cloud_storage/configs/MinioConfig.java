@@ -19,15 +19,15 @@ import java.security.NoSuchAlgorithmException;
 
 @Configuration
 public class MinioConfig {
-    @Value("${spring.minio.url}")
+    @Value("${minio.url}")
     private String url;
-    @Value("${spring.minio.access-key}")
+    @Value("${minio.access-key}")
     private String accessKey;
-    @Value("${spring.minio.secret-key}")
+    @Value("${minio.secret-key}")
     private String secretKey;
-    @Value("${spring.minio.port}")
+    @Value("${minio.port}")
     private int port;
-    @Value("${spring.minio.bucket")
+    @Value("${minio.bucket}")
     private String bucketName;
 
     @Bean
