@@ -3,3 +3,17 @@ spring:
     url: jdbc:mysql://localhost:3307/clouddb
     username: clouduser
     password: secret
+
+  jpa:
+    show-sql: true
+
+  flyway:
+    baselineOnMigrate: true
+    locations: classpath:db/migration
+
+minio:
+  url: http://localhost:9001
+  bucket: cloud-storage
+  access-key: minioadmin
+  secret-key: minioadmin
+  port: 9000

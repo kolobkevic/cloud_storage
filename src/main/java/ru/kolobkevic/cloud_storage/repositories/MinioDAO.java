@@ -1,6 +1,13 @@
 package ru.kolobkevic.cloud_storage.repositories;
 
-import io.minio.*;
+import io.minio.CopyObjectArgs;
+import io.minio.CopySource;
+import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.ListObjectsArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
+import io.minio.Result;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
@@ -14,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+import ru.kolobkevic.cloud_storage.models.StorageObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -43,7 +51,7 @@ public class MinioDAO {
     private String schema;
     @Value("${url.port}")
     private String port;
-    @Value("${url.hostName}")
+    @Value("${url.host}")
     private String hostName;
     private static final int PART_SIZE = 104857600;
 
@@ -56,40 +64,34 @@ public class MinioDAO {
                         .build());
     }
 
-    public List<File> getListOfFiles(String objectName) {
-        List<File> files = new ArrayList<>();
+    public List<StorageObject> getListOfFiles(String objectName) {
+        List<StorageObject> files = new ArrayList<>();
         var minioObjects = getObjects(objectName);
 
         try {
             for (var minioObject : minioObjects) {
                 Item item = minioObject.get();
+                String path = item.objectName();
+                log.info("item.objectName: " + path);
 
-                String displayName = getFileName(item.objectName());
+                String displayName = getFileName(path);
+                log.info("displayName: " + displayName);
+
+                boolean isDir = isDirectory(path);
+                String url;
 
                 if (!displayName.isEmpty()) {
-
-                    String path = getPathWithoutRoot(item.objectName());
-                    String currentDirectoryPath = getParentPath(path);
-                    String encodedCurrentDirectoryPath = URLEncoder.encode(currentDirectoryPath, StandardCharsets.UTF_8);
-                    String urlCurEncoded = getUrlForDirectory(encodedCurrentDirectoryPath);
-
-                    // Get URL of file or subdirectory
-                    String urlSubEncoded;
-
-                    if (isDirectory(item.objectName())) {
-                        String encodedSubDirectoryPath = URLEncoder.encode(path, StandardCharsets.UTF_8.toString());
-                        urlSubEncoded = getUrlForDirectory(encodedSubDirectoryPath);
-                    } else {
-                        urlSubEncoded = getPreSignedObjectUrl(bucketName, item.objectName());
-                    }
-
-                    // Create file-info with params. idOnPage needs for correct Thymeleaf foreach loop in modal form
-//                files.add(new File(displayName, item.objectName(), urlSubEncoded, urlCurEncoded));
+                    url = isDir ?
+                            getUrlForDirectory(URLEncoder.encode(displayName, StandardCharsets.UTF_8)) :
+                            getPreSignedObjectUrl(bucketName, path);
+                files.add(new StorageObject(displayName, path, url, isDir));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        log.info("File 1: " + files.get(0).toString());
+        log.info("File 2: " + files.get(1).toString());
         return files;
     }
 
@@ -133,16 +135,6 @@ public class MinioDAO {
                         .build());
     }
 
-    private String getPathWithoutRoot(String str) {
-        Path path = Paths.get(str);
-        return path.subpath(1, path.getNameCount() - 1).toString();
-    }
-
-    private String getParentPath(String str) {
-        Path path = Paths.get(str);
-        return isDirectory(str) ? path.getParent().toString() : path.getParent().toString() + "/";
-    }
-
     private boolean isDirectory(String str) {
         return str.endsWith("/");
     }
@@ -174,7 +166,7 @@ public class MinioDAO {
                         .method(Method.GET)
                         .bucket(bucketName)
                         .object(objectName)
-                        .expiry(2, TimeUnit.HOURS)
+                        .expiry(1, TimeUnit.DAYS)
                         .extraQueryParams(new HashMap<>(
                                 Map.of("response-content-type", "application/octet-stream")))
                         .build());
