@@ -64,10 +64,11 @@ public class MinioDAO implements StorageDAO {
                 String path = item.objectName();
                 log.info("item.objectName: " + path);
 
-                boolean isDir = item.isDir();
+                boolean isDir = item.isDir() || path.endsWith("/");
                 log.info("item is directory: " + isDir);
 
-                String displayName = isDir ? getFolderName(path) : path;
+//                String displayName = isDir ? getFolderName(path) : path;
+                String displayName = getFolderName(path);
                 log.info("displayName: " + displayName);
 
                 files.add(new StorageObject(displayName, path, isDir));
@@ -138,27 +139,10 @@ public class MinioDAO implements StorageDAO {
         }
     }
 
+    @Override
     public void renameObject(String oldName, String newName) {
         copyObject(oldName, newName);
         removeObject(oldName);
-    }
-
-    private String getFolderName(String str) {
-        var splitted = str.split("/");
-        return splitted[splitted.length - 1];
-    }
-
-    private String getUrlForDirectory(String encodedSubDirectoryPath) {
-
-        return UriComponentsBuilder
-                .newInstance()
-                .scheme(schema)
-                .host(hostName)
-                .port(port)
-                .path("/")
-                .queryParam("path", encodedSubDirectoryPath)
-                .build()
-                .toUriString();
     }
 
     @Override
@@ -190,5 +174,23 @@ public class MinioDAO implements StorageDAO {
         } catch (Exception e) {
             throw new RuntimeException();
         }
+    }
+
+    private String getFolderName(String str) {
+        var splitted = str.split("/");
+        return splitted[splitted.length - 1];
+    }
+
+    private String getUrlForDirectory(String encodedSubDirectoryPath) {
+
+        return UriComponentsBuilder
+                .newInstance()
+                .scheme(schema)
+                .host(hostName)
+                .port(port)
+                .path("/")
+                .queryParam("path", encodedSubDirectoryPath)
+                .build()
+                .toUriString();
     }
 }
