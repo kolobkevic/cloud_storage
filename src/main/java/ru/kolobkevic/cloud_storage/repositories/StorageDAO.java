@@ -1,5 +1,6 @@
 package ru.kolobkevic.cloud_storage.repositories;
 
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Component;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
 
@@ -19,4 +20,6 @@ public interface StorageDAO {
     void removeObject(String filePath);
 
     String getObjectUrl(String objectName);
+
+    ByteArrayResource downloadObject(String filePath);
 }

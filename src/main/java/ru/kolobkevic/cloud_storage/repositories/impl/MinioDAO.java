@@ -2,6 +2,7 @@ package ru.kolobkevic.cloud_storage.repositories.impl;
 
 import io.minio.CopyObjectArgs;
 import io.minio.CopySource;
+import io.minio.GetObjectArgs;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.ListObjectsArgs;
 import io.minio.MinioClient;
@@ -13,6 +14,7 @@ import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
@@ -20,9 +22,6 @@ import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,24 +64,17 @@ public class MinioDAO implements StorageDAO {
                 String path = item.objectName();
                 log.info("item.objectName: " + path);
 
-                String displayName = getFileName(path);
+                boolean isDir = item.isDir();
+                log.info("item is directory: " + isDir);
+
+                String displayName = isDir ? getFolderName(path) : path;
                 log.info("displayName: " + displayName);
 
-                boolean isDir = isDirectory(path);
-                String url;
-
-                if (!displayName.isEmpty()) {
-                    url = isDir ?
-                            getUrlForDirectory(URLEncoder.encode(displayName, StandardCharsets.UTF_8)) :
-                            getObjectUrl(path);
-                    files.add(new StorageObject(displayName, path, url, isDir));
-                }
+                files.add(new StorageObject(displayName, path, isDir));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        log.info("File 1: " + files.get(0).toString());
-        log.info("File 2: " + files.get(1).toString());
         return files;
     }
 
@@ -146,12 +138,14 @@ public class MinioDAO implements StorageDAO {
         }
     }
 
-    private boolean isDirectory(String str) {
-        return str.endsWith("/");
+    public void renameObject(String oldName, String newName) {
+        copyObject(oldName, newName);
+        removeObject(oldName);
     }
 
-    private String getFileName(String str) {
-        return Paths.get(str).getFileName().toString();
+    private String getFolderName(String str) {
+        var splitted = str.split("/");
+        return splitted[splitted.length - 1];
     }
 
     private String getUrlForDirectory(String encodedSubDirectoryPath) {
@@ -182,6 +176,19 @@ public class MinioDAO implements StorageDAO {
         } catch (Exception e) {
             e.printStackTrace();
             return "Could not get URL";
+        }
+    }
+
+    @Override
+    public ByteArrayResource downloadObject(String filePath) {
+        GetObjectArgs objectArgs = GetObjectArgs.builder()
+                .bucket(bucketName)
+                .object(filePath)
+                .build();
+        try (var object = minioClient.getObject(objectArgs)) {
+            return new ByteArrayResource(object.readAllBytes());
+        } catch (Exception e) {
+            throw new RuntimeException();
         }
     }
 }

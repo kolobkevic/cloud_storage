@@ -12,6 +12,5 @@ import org.springframework.stereotype.Component;
 public class StorageObject {
     private String objectName;
     private String path;
-    private String url;
     private boolean isDir;
 }

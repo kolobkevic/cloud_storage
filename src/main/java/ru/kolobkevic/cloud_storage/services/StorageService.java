@@ -15,45 +15,46 @@ import java.util.List;
 public class StorageService {
     private final StorageDAO storageDAO;
 
-    public void createUserFolder(Long id) {
-        storageDAO.createFolder(getUserFolderName(id));
+    public void createUserFolder(String username) {
+        storageDAO.createFolder(getUserFolderName(username));
     }
 
-    public String getUserFolderName(Long id) {
-        return "user-" + id + "-files/";
+    public String getUserFolderName(String username) {
+        return "user-" + username + "-files/";
     }
 
-    public List<StorageObject> getListOfObjects(String objectName) {
-        return storageDAO.getListOfObjects(objectName);
+    public List<StorageObject> getListOfObjects(String username, String objectName) {
+        return storageDAO.getListOfObjects(getUserFolderName(username) + objectName);
     }
 
     private void uploadObject(String filePath, InputStream in) {
         storageDAO.uploadObject(filePath, in);
     }
 
-    public void uploadFile(MultipartFile file, String filePath) throws IOException {
-        uploadObject(filePath, file.getInputStream());
+    public void uploadFile(String username, MultipartFile file, String filePath) throws IOException {
+        uploadObject(getUserFolderName(username) + filePath, file.getInputStream());
     }
 
-    public void uploadFolder(MultipartFile[] files, String folderPath) throws IOException {
+    public void uploadFolder(String username, MultipartFile[] files, String folderPath) throws IOException {
         for (var file : files) {
-            uploadObject(folderPath, file.getInputStream());
+            uploadObject(getUserFolderName(username) + folderPath, file.getInputStream());
         }
     }
 
-    public void createFolder(String folderName){
-        storageDAO.createFolder(folderName);
+    public void createFolder(String username, String folderName) {
+        storageDAO.createFolder(getUserFolderName(username) + folderName);
     }
 
-    public void copyObject(String filePath, String newPath) {
-        storageDAO.copyObject(filePath, newPath);
+    public void copyObject(String username, String filePath, String newPath) {
+        storageDAO.copyObject(getUserFolderName(username) + filePath,
+                getUserFolderName(username) + newPath);
     }
 
-    public void removeObject(String filePath) {
-        storageDAO.removeObject(filePath);
+    public void removeObject(String username, String filePath) {
+        storageDAO.removeObject(getUserFolderName(username) + filePath);
     }
 
-    public String getObjectUrl(String objectName) {
-        return storageDAO.getObjectUrl(objectName);
+    public String getObjectUrl(String username, String objectName) {
+        return storageDAO.getObjectUrl(getUserFolderName(username) + objectName);
     }
 }
