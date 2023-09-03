@@ -1,10 +1,10 @@
-package ru.kolobkevic.cloud_storage.entities;
+package ru.kolobkevic.cloud_storage.models;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.kolobkevic.cloud_storage.entities.enums.RoleType;
+import ru.kolobkevic.cloud_storage.models.enums.RoleType;
 
 @Entity
 @Table(name = "roles")

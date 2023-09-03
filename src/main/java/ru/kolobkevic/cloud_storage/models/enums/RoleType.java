@@ -1,4 +1,4 @@
-package ru.kolobkevic.cloud_storage.entities.enums;
+package ru.kolobkevic.cloud_storage.models.enums;
 
 public enum RoleType {
     USER, ADMIN;

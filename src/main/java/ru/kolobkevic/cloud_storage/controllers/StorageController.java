@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
+import ru.kolobkevic.cloud_storage.dtos.FileDto;
+import ru.kolobkevic.cloud_storage.dtos.FileRequestDto;
 import ru.kolobkevic.cloud_storage.services.StorageService;
 
 @Controller
@@ -31,24 +32,23 @@ public class StorageController {
                            Model model) {
         model.addAttribute("breadCrumbs", storageService.getBreadCrumb(path));
         model.addAttribute("files", storageService.getListOfObjects(user.getUsername(), path));
+        model.addAttribute("username", user.getUsername());
 
         return "cloud-storage";
     }
 
     @PostMapping
-    public String uploadFile(@ModelAttribute("file") MultipartFile file,
-                             @AuthenticationPrincipal User user,
-                             @RequestParam(value = "path", required = false, defaultValue = "") String path) {
-        storageService.uploadFile(user.getUsername(), file, path);
-
+    public String uploadFile(@ModelAttribute("fileDto") FileDto fileDto) {
+        storageService.uploadFile(fileDto.getUsername(), fileDto.getFile(), fileDto.getFile().getName());
         return "redirect:/storage";
     }
 
     @PutMapping
-    public String renameFile(@AuthenticationPrincipal User user,
-                             @RequestParam(value = "oldPath") String oldPath,
+    public String renameFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto,
                              @RequestParam(value = "newPath") String newPath) {
-        storageService.renameObject(user.getUsername(), oldPath, newPath);
+        var username = fileRequestDto.getUsername();
+        var oldPath = fileRequestDto.getPath();
+        storageService.renameObject(username, oldPath, newPath);
         return "redirect:/storage";
     }
 
@@ -61,10 +61,12 @@ public class StorageController {
 
     @GetMapping(produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
-    public ResponseEntity<ByteArrayResource> downloadFile(@AuthenticationPrincipal User user,
-                                                          @RequestParam(value = "filename") String filename) {
+    public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto) {
+        var fileName = fileRequestDto.getObjectName();
+        var userName = fileRequestDto.getUsername();
+        var file = storageService.downloadFile(userName, fileName);
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=" + filename)
-                .body(storageService.downloadFile(user.getUsername(), filename));
+                .header("Content-Disposition", "attachment; filename=" + fileName)
+                .body(file);
     }
 }

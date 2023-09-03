@@ -3,7 +3,7 @@ package ru.kolobkevic.cloud_storage.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import ru.kolobkevic.cloud_storage.entities.User;
+import ru.kolobkevic.cloud_storage.models.User;
 import ru.kolobkevic.cloud_storage.services.StorageService;
 import ru.kolobkevic.cloud_storage.services.UserService;
 
