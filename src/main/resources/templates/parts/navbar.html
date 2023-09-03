@@ -2,9 +2,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">Cloud storage</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
-                    aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -13,13 +12,13 @@
                         <a class="nav-link active" aria-current="page" href="/">Главная</a>
                     </li>
                     <li class="nav-item" th:if="${user}">
-                        <a class="nav-link" href="/cloud-storage">Мои файлы</a>
+                        <a class="nav-link" href="/files">Мои файлы</a>
                     </li>
                 </ul>
             </div>
 
             <form th:action="@{/files/search}" th:method="GET" id="from__search" th:if="${user}">
-                <div class="input-group" >
+                <div class="input-group">
                     <input type="text" name="query" class="form-control" placeholder="Поиск файлов"
                            aria-label="Recipient's username" aria-describedby="button-addon2">
                     <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Найти</button>
@@ -35,7 +34,7 @@
                 <a href="/logout" class="nav-link">Выйти</a>
             </div>
             <div class="d-flex" th:unless="${user}">
-                <a href="/auth/login" class="nav-link">Войти</a>
+                <a href="/login" class="nav-link">Войти</a>
             </div>
         </div>
     </nav>

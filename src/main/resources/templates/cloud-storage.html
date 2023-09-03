@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org" lang="EN">
-<head th:replace="template-part/header :: header">
+<head th:replace="parts/header :: header">
 </head>
 <body>
-<div th:replace="template-part/navigation-menu :: nav"></div>
+<div th:replace="parts/navbar :: nav"></div>
 
 <div class="container main">
-
-    <div th:replace="template-part/files-page-top-control :: files-control"></div>
 
     <div class="files-list">
         <div class="col-auto mt-5">
@@ -16,41 +14,124 @@
         </div>
     </div>
 
-    <ul class="list-group">
-        <li th:each="obj : ${listObjects}" th:object="${obj}" class="list-group-item list-group-item-action
-        d-flex justify-content-between align-items-center">
-            <a style="text-decoration: none" th:href="*{url}" th:text="*{objectName}">Name</a>
-            <div class="btn-group">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                    . . .
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <button type="submit" class="dropdown-item" data-bs-toggle="modal"
-                                th:attr="data-bs-target=${'#renameModal'+file.idOnPage}">
-                            Rename
-                        </button>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <form th:action="@{/remove}" th:method="DELETE">
-                        <li>
-                            <input type="hidden" th:value="*{objectName}" name="objectName"/>
+    <div th:if="${files}">
+        <h6 class="mb-3">Folders</h6>
+        <div class="row row-cols-1 row-cols-md-5 g-4">
+            <div class="col" th:each="file, iterStat : ${files}" th:if="${file.isDir}">
+                <div class="card flex-row p-2 align-items-center justify-content-between shadow-4-strong">
 
-                            <button type="submit" class="dropdown-item">Delete</button>
-                        </li>
-                    </form>
-                </ul>
+                    <!-- Folder Name -->
+                    <div class="d-flex align-items-center w-75 position-relative">
+                        <img alt="folder" style="width: 2rem" th:src="@{/img/folder.png}"/>
+                        <span class="ms-2 d-block text-truncate" th:text="${file.objectName}"></span>
+                        <a class="stretched-link" th:href="@{'/?path=' + ${file.path}}"></a>
+                    </div>
+
+                    <!-- Folder Actions -->
+                    <div>
+                        <div class="dropdown">
+                            <button aria-expanded="false" class="bg-white"
+                                    data-bs-toggle="dropdown" id="folderDropdown"
+                                    style="border: none; width: 2.5rem; :after" type="button">
+                                <img class="w-50" th:src="@{/img/more.png}"/>
+                            </button>
+
+                            <ul aria-labelledby="folderDropdown" class="dropdown-menu">
+
+                                <!-- Folder Rename -->
+                                <li>
+                                    <button class="dropdown-item"
+                                            data-mdb-toggle="modal"
+                                            th:attr="data-mdb-target=|#rename-${iterStat.index}|">
+                                        Rename
+                                    </button>
+                                </li>
+
+                                <!-- Folder Delete -->
+                                <li>
+                                    <form th:action="@{/folders}" th:method="delete"
+                                          th:object="${folderDeleteRequest}">
+                                        <input th:name="path" th:value="${file.path}" type="hidden">
+                                        <input th:name="owner" th:value="${username}" type="hidden">
+                                        <button class="dropdown-item" type="submit">Delete</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Folder Rename Modal -->
+                <div th:replace="parts/rename :: rename"></div>
+
             </div>
-        </li>
-    </ul>
+        </div>
+    </div>
 
-    <div th:replace="template-part/renameForm::renameForm"></div>
+    <!-- Files -->
+    <div class="mt-5" th:if="${files}">
+        <h6 class="mb-3">Files</h6>
+        <div class="row row-cols-1 row-cols-md-5 g-4">
+            <div class="col" th:each="file, iterStat : ${files}" th:unless="${file.isDir}">
+                <div class="card flex-row p-2 align-items-center justify-content-between shadow-4-strong">
 
+                    <!-- File Name -->
+                    <div class="d-flex align-items-center w-75 position-relative">
+                        <img alt="file" style="width: 2rem" th:src="@{/img/file.png}"/>
+                        <span class="ms-2 d-block text-truncate" th:text="${file.objectName}"></span>
+
+                        <!-- File Download -->
+                        <form th:action="@{/files}" th:method="get"
+                              th:object="${fileRequest}">
+                            <input th:name="path" th:value="${file.path}" type="hidden">
+                            <input th:name="username" th:value="${userName}" type="hidden">
+                            <input th:name="name" th:value="${file.objectName}" type="hidden">
+                            <button class="stretched-link" style="border: none"
+                                    type="submit"></button>
+                        </form>
+                    </div>
+
+                    <!-- File Actions -->
+                    <div>
+                        <div class="dropdown">
+                            <button aria-expanded="false" class="bg-white"
+                                    data-bs-toggle="dropdown" id="fileDropdown"
+                                    style="border: none; width: 2.5rem; :after" type="button">
+                                <img class="w-50" th:src="@{/img/more.png}"/>
+                            </button>
+
+                            <ul aria-labelledby="fileDropdown" class="dropdown-menu">
+
+                                <!-- File Rename -->
+                                <li>
+                                    <button class="dropdown-item"
+                                            data-mdb-toggle="modal"
+                                            th:attr="data-mdb-target=|#rename-${iterStat.index}|">
+                                        Rename
+                                    </button>
+                                </li>
+
+                                <!-- File Delete -->
+                                <li>
+                                    <form th:action="@{/files}" th:method="delete"
+                                          th:object="${fileDeleteRequest}">
+                                        <input th:name="path" th:value="${file.path}" type="hidden">
+                                        <input th:name="owner" th:value="${username}" type="hidden">
+                                        <button class="dropdown-item" type="submit">Delete</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Rename Modal -->
+                                <div th:replace="parts/rename :: rename"></div>
+
+            </div>
+        </div>
+    </div>
 </div>
-
-<div th:replace="template-part/footer :: footer"></div>
+<div th:replace="parts/footer :: footer"></div>
 </body>
 </html>
