@@ -17,7 +17,7 @@
     <div th:if="${files}">
         <h6 class="mb-3">Folders</h6>
         <div class="row row-cols-1 row-cols-md-5 g-4">
-            <div class="col" th:each="file, iterStat : ${files}" th:if="${file.isDir}">
+            <div class="col" th:each="file, fileStat : ${files}" th:if="${file.isDir}">
                 <div class="card flex-row p-2 align-items-center justify-content-between shadow-4-strong">
 
                     <!-- Folder Name -->
@@ -42,7 +42,7 @@
                                 <li>
                                     <button class="dropdown-item"
                                             data-mdb-toggle="modal"
-                                            th:attr="data-mdb-target=|#rename-${iterStat.index}|">
+                                            th:attr="data-mdb-target=|#rename-${fileStat.index}|">
                                         Rename
                                     </button>
                                 </li>
@@ -72,7 +72,7 @@
     <div class="mt-5" th:if="${files}">
         <h6 class="mb-3">Files</h6>
         <div class="row row-cols-1 row-cols-md-5 g-4">
-            <div class="col" th:each="file, iterStat : ${files}" th:unless="${file.isDir}">
+            <div class="col" th:each="file, fileStat : ${files}" th:unless="${file.isDir}">
                 <div class="card flex-row p-2 align-items-center justify-content-between shadow-4-strong">
 
                     <!-- File Name -->
@@ -106,7 +106,7 @@
                                 <li>
                                     <button class="dropdown-item"
                                             data-mdb-toggle="modal"
-                                            th:attr="data-mdb-target=|#rename-${iterStat.index}|">
+                                            th:attr="data-mdb-target=|#rename-${fileStat.index}|">
                                         Rename
                                     </button>
                                 </li>

@@ -1,5 +1,5 @@
 <div aria-hidden="true" class="modal fade" tabindex="-1"
-     th:fragment="rename" th:id="|rename-${iterStat.index}|">
+     th:fragment="rename" th:id="|rename-${fileStat.index}|">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -7,7 +7,7 @@
         <button aria-label="Close" class="btn-close" data-mdb-dismiss="modal" type="button"></button>
       </div>
       <div class="modal-body">
-        <form th:action="@{/files}" th:id="|rename-form-${iterStat.index}|" th:method="put"
+        <form th:action="@{/files}" th:id="|rename-form-${fileStat.index}|" th:method="put"
               th:object="${fileRequest}">
           <div class="form-outline">
             <input class="form-control" id="newPath" th:name="newPath" th:value="${file.objectName}" type="text">
@@ -19,7 +19,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" data-mdb-dismiss="modal" type="button">Close</button>
-        <button class="btn btn-primary" th:attr="form=|rename-${iterStat.index}|" type="submit">Ok
+        <button class="btn btn-primary" th:attr="form=|rename-${fileStat.index}|" type="submit">Ok
         </button>
       </div>
     </div>
