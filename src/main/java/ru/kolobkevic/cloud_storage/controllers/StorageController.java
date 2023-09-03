@@ -1,6 +1,7 @@
 package ru.kolobkevic.cloud_storage.controllers;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import ru.kolobkevic.cloud_storage.services.StorageService;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/storage")
+@Slf4j
 public class StorageController {
     private final StorageService storageService;
 
@@ -30,6 +32,7 @@ public class StorageController {
     public String getFiles(@AuthenticationPrincipal User user,
                            @RequestParam(value = "path", required = false, defaultValue = "") String path,
                            Model model) {
+        log.info("Path: " + path);
         model.addAttribute("breadCrumbs", storageService.getBreadCrumb(path));
         model.addAttribute("files", storageService.getListOfObjects(user.getUsername(), path));
         model.addAttribute("username", user.getUsername());
@@ -59,7 +62,7 @@ public class StorageController {
         return "redirect:/storage";
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
     public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto) {
         var fileName = fileRequestDto.getObjectName();

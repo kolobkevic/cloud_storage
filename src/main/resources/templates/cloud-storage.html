@@ -14,6 +14,21 @@
         </div>
     </div>
 
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a th:class="${breadCrumbs == null ? 'breadcrumb-item active' : ''}"
+                   th:href="@{/storage}">Storage</a>
+            </li>
+            <li class="breadcrumb-item" th:each="link, iterStat : ${breadCrumbs}"
+                th:if="${!#strings.isEmpty(link)}">
+                <a th:class="${iterStat.last ? 'breadcrumb-item active' : 'breadcrumb-item'}"
+                   th:href="${'storage?path=' + link}"
+                   th:text="${breadCrumbs[iterStat.index]}"></a>
+            </li>
+        </ol>
+    </nav>
+
     <div th:if="${files}">
         <h6 class="mb-3">Folders</h6>
         <div class="row row-cols-1 row-cols-md-5 g-4">
@@ -24,7 +39,7 @@
                     <div class="d-flex align-items-center w-75 position-relative">
                         <img alt="folder" style="width: 2rem" th:src="@{/img/folder.png}"/>
                         <span class="ms-2 d-block text-truncate" th:text="${file.objectName}"></span>
-                        <a class="stretched-link" th:href="@{'/?path=' + ${file.path}}"></a>
+                        <a class="stretched-link" th:href="@{'storage?path=' + ${file.path}}"></a>
                     </div>
 
                     <!-- Folder Actions -->
@@ -81,11 +96,11 @@
                         <span class="ms-2 d-block text-truncate" th:text="${file.objectName}"></span>
 
                         <!-- File Download -->
-                        <form th:action="@{/files}" th:method="get"
+                        <form th:action="@{/storage/download}" th:method="get"
                               th:object="${fileRequest}">
                             <input th:name="path" th:value="${file.path}" type="hidden">
-                            <input th:name="username" th:value="${userName}" type="hidden">
-                            <input th:name="name" th:value="${file.objectName}" type="hidden">
+                            <input th:name="username" th:value="${username}" type="hidden">
+                            <input th:name="objectName" th:value="${file.objectName}" type="hidden">
                             <button class="stretched-link" style="border: none"
                                     type="submit"></button>
                         </form>
