@@ -25,7 +25,7 @@ public class StorageService {
     }
 
     public List<StorageObject> getListOfObjects(String username, String objectName) {
-        return storageDAO.getListOfObjects(getUserFolderName(username) + objectName);
+        return storageDAO.getListOfObjects(getUserFolderName(username) + getPathWithoutUsername(objectName));
     }
 
     private void uploadObject(String filePath, InputStream in) {
@@ -60,7 +60,7 @@ public class StorageService {
     }
 
     public void removeObject(String username, String filePath) {
-        storageDAO.removeObject(getUserFolderName(username) + filePath);
+        storageDAO.removeObject(getUserFolderName(username) + getPathWithoutUsername(filePath));
     }
 
     public String getObjectUrl(String username, String objectName) {
@@ -74,10 +74,14 @@ public class StorageService {
     }
 
     public ByteArrayResource downloadFile(String username, String objectName) {
-        return storageDAO.downloadObject(getUserFolderName(username) + objectName);
+        return storageDAO.downloadObject(getUserFolderName(username) + getPathWithoutUsername(objectName));
     }
 
     public List<String> getBreadCrumb(String path) {
         return path.isEmpty() ? Collections.emptyList() : List.of(path.split("/"));
+    }
+
+    private String getPathWithoutUsername(String path) {
+        return path.isEmpty() ? path : path.substring(path.indexOf('/') + 1);
     }
 }

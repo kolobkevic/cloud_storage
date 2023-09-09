@@ -1,15 +1,10 @@
 package ru.kolobkevic.cloud_storage.repositories.impl;
 
-import io.minio.CopyObjectArgs;
-import io.minio.CopySource;
-import io.minio.GetObjectArgs;
-import io.minio.GetPresignedObjectUrlArgs;
-import io.minio.ListObjectsArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
-import io.minio.Result;
+import io.minio.*;
+import io.minio.errors.*;
 import io.minio.http.Method;
+import io.minio.messages.DeleteError;
+import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +16,10 @@ import ru.kolobkevic.cloud_storage.models.StorageObject;
 import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,19 +42,20 @@ public class MinioDAO implements StorageDAO {
     private String hostName;
     private static final int PART_SIZE = 104857600;
 
-    private Iterable<Result<Item>> getObjects(String objectName) {
+    private Iterable<Result<Item>> getObjects(String objectName, boolean isRecursive) {
         log.info("Getting list of objects with name " + objectName + " from bucket " + bucketName);
         return minioClient.listObjects(
                 ListObjectsArgs.builder()
                         .bucket(bucketName)
                         .prefix(objectName)
+                        .recursive(isRecursive)
                         .build());
     }
 
     @Override
     public List<StorageObject> getListOfObjects(String objectName) {
         List<StorageObject> files = new ArrayList<>();
-        var minioObjects = getObjects(objectName);
+        var minioObjects = getObjects(objectName, false);
 
         try {
             for (var minioObject : minioObjects) {
@@ -67,7 +66,6 @@ public class MinioDAO implements StorageDAO {
                 boolean isDir = item.isDir() || path.endsWith("/");
                 log.info("item is directory: " + isDir);
 
-//                String displayName = isDir ? getFolderName(path) : path;
                 String displayName = getFolderName(path);
                 log.info("displayName: " + displayName);
 
@@ -128,14 +126,21 @@ public class MinioDAO implements StorageDAO {
 
     @Override
     public void removeObject(String filePath) {
-        try {
-            minioClient.removeObject(
-                    RemoveObjectArgs.builder()
-                            .bucket(bucketName)
-                            .object(filePath)
-                            .build());
-        } catch (Exception e) {
-            e.printStackTrace();
+        var objects = prepareForDelete(filePath);
+
+        var deleteResults = minioClient.removeObjects(
+                RemoveObjectsArgs.builder()
+                        .bucket(bucketName)
+                        .objects(objects)
+                        .build());
+
+        for (var obj : deleteResults) {
+            try {
+                var error = obj.get();
+                log.warn("Error in deleting object " + error.objectName() + "; " + error.message());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -179,6 +184,20 @@ public class MinioDAO implements StorageDAO {
     private String getFolderName(String str) {
         var splitted = str.split("/");
         return splitted[splitted.length - 1];
+    }
+
+    private List<DeleteObject> prepareForDelete(String filePath) {
+        var objects = getObjects(filePath, true);
+        List<DeleteObject> objectsForDelete = new ArrayList<>();
+
+        try {
+            for (var obj : objects) {
+                objectsForDelete.add(new DeleteObject(obj.get().objectName()));
+            }
+            return objectsForDelete;
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
     }
 
     private String getUrlForDirectory(String encodedSubDirectoryPath) {
