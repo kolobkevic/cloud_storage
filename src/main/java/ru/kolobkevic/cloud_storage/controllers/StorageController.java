@@ -56,16 +56,15 @@ public class StorageController {
     }
 
     @DeleteMapping
-    public String deleteFile(@AuthenticationPrincipal User user,
-                             @RequestParam(value = "path") String path) {
-        storageService.removeObject(user.getUsername(), path);
+    public String deleteFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto) {
+        storageService.removeObject(fileRequestDto.getUsername(), fileRequestDto.getPath());
         return "redirect:/storage";
     }
 
     @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
     public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto) {
-        var fileName = fileRequestDto.getObjectName();
+        var fileName = fileRequestDto.getPath();
         var userName = fileRequestDto.getUsername();
         var file = storageService.downloadFile(userName, fileName);
         return ResponseEntity.ok()

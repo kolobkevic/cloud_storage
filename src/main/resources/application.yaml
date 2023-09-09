@@ -4,6 +4,10 @@ spring:
     username: clouduser
     password: secret
 
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
   jpa:
     show-sql: true
 

@@ -64,10 +64,11 @@
 
                                 <!-- Folder Delete -->
                                 <li>
-                                    <form th:action="@{/folders}" th:method="delete"
-                                          th:object="${folderDeleteRequest}">
+                                    <form th:action="@{/storage}" th:method="delete"
+                                          th:object="${fileRequest}">
                                         <input th:name="path" th:value="${file.path}" type="hidden">
-                                        <input th:name="owner" th:value="${username}" type="hidden">
+                                        <input th:name="username" th:value="${username}" type="hidden">
+                                        <input th:name="objectName" th:value="${file.objectName}" type="hidden">
                                         <button class="dropdown-item" type="submit">Delete</button>
                                     </form>
                                 </li>
@@ -128,10 +129,11 @@
 
                                 <!-- File Delete -->
                                 <li>
-                                    <form th:action="@{/files}" th:method="delete"
-                                          th:object="${fileDeleteRequest}">
+                                    <form th:action="@{/storage}" th:method="delete"
+                                          th:object="${fileRequest}">
                                         <input th:name="path" th:value="${file.path}" type="hidden">
-                                        <input th:name="owner" th:value="${username}" type="hidden">
+                                        <input th:name="username" th:value="${username}" type="hidden">
+                                        <input th:name="objectName" th:value="${file.objectName}" type="hidden">
                                         <button class="dropdown-item" type="submit">Delete</button>
                                     </form>
                                 </li>
