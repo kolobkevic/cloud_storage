@@ -11,8 +11,6 @@ import org.springframework.stereotype.Component;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileRequestDto {
-    private String objectName;
-    private String path;
-    private String username;
+public class FileRenameRequestDto extends FileRequestDto{
+    private String newPath;
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import ru.kolobkevic.cloud_storage.dtos.FileDto;
+import ru.kolobkevic.cloud_storage.dtos.FileRenameRequestDto;
 import ru.kolobkevic.cloud_storage.dtos.FileRequestDto;
 import ru.kolobkevic.cloud_storage.services.StorageService;
 
@@ -47,10 +48,10 @@ public class StorageController {
     }
 
     @PutMapping
-    public String renameFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto,
-                             @RequestParam(value = "newPath") String newPath) {
-        var username = fileRequestDto.getUsername();
-        var oldPath = fileRequestDto.getPath();
+    public String renameFile(@ModelAttribute("fileRenameRequest") FileRenameRequestDto fileRenameRequestDto) {
+        var username = fileRenameRequestDto.getUsername();
+        var oldPath = fileRenameRequestDto.getPath();
+        var newPath = fileRenameRequestDto.getNewPath();
         storageService.renameObject(username, oldPath, newPath);
         return "redirect:/storage";
     }

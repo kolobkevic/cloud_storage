@@ -69,8 +69,8 @@ public class StorageService {
 
     public void renameObject(String username, String oldName, String newName) {
         storageDAO.renameObject(
-                getUserFolderName(username) + oldName,
-                getUserFolderName(username) + newName);
+                getUserFolderName(username) + getPathWithoutUsername(oldName),
+                getUserFolderName(username) + getPathWithoutUsername(getPathWithNewFileName(oldName, newName)));
     }
 
     public ByteArrayResource downloadFile(String username, String objectName) {
@@ -83,5 +83,13 @@ public class StorageService {
 
     private String getPathWithoutUsername(String path) {
         return path.isEmpty() ? path : path.substring(path.indexOf('/') + 1);
+    }
+
+    private String getFileNameFromPath(String path) {
+        return path.substring(path.lastIndexOf("/") + 1);
+    }
+
+    private String getPathWithNewFileName(String path, String newName) {
+        return path.replace(getFileNameFromPath(path), newName);
     }
 }

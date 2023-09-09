@@ -1,27 +1,25 @@
-<div aria-hidden="true" class="modal fade" tabindex="-1"
-     th:fragment="rename" th:id="|rename-${fileStat.index}|">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Rename</h5>
-        <button aria-label="Close" class="btn-close" data-mdb-dismiss="modal" type="button"></button>
-      </div>
-      <div class="modal-body">
-        <form th:action="@{/files}" th:id="|rename-form-${fileStat.index}|" th:method="put"
-              th:object="${fileRequest}">
-          <div class="form-outline">
-            <input class="form-control" id="newPath" th:name="newPath" th:value="${file.objectName}" type="text">
-          </div>
-          <input th:name="currentName" th:value="${file.objectName}" type="hidden">
-          <input th:name="path" th:value="${file.path}" type="hidden">
-          <input th:name="username" th:value="${userName}" type="hidden">
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-mdb-dismiss="modal" type="button">Close</button>
-        <button class="btn btn-primary" th:attr="form=|rename-${fileStat.index}|" type="submit">Ok
-        </button>
-      </div>
+<div aria-hidden="true" class="modal fade" tabindex="-1" th:fragment="rename" th:id="|rename-${fileStat.index}|">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Rename</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/storage}" th:id="|rename-form-${fileStat.index}|" th:method="put"
+                      th:object="${fileRenameRequest}">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" th:name="newPath" th:value="${file.objectName}">
+                    </div>
+                    <input th:name="path" th:value="${file.path}" type="hidden">
+                    <input th:name="username" th:value="${username}" type="hidden">
+                    <input th:name="objectName" th:value="${file.objectName}" type="hidden">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" th:attr="form=|rename-form-${fileStat.index}|">Rename</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>

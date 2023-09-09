@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org" lang="EN">
-<head th:replace="parts/header :: header">
+<head th:replace="~{parts/header :: header}">
 </head>
 <body>
-<div th:replace="parts/navbar :: nav"></div>
+<div th:replace="~{parts/navbar :: nav}"></div>
 
 <div class="container main">
 
@@ -57,7 +57,7 @@
                                 <li>
                                     <button class="dropdown-item"
                                             data-mdb-toggle="modal"
-                                            th:attr="data-mdb-target=|#rename-${fileStat.index}|">
+                                            >
                                         Rename
                                     </button>
                                 </li>
@@ -78,7 +78,7 @@
                 </div>
 
                 <!-- Folder Rename Modal -->
-                <div th:replace="parts/rename :: rename"></div>
+<!--                <div th:replace="~{parts/rename :: rename}"></div>-->
 
             </div>
         </div>
@@ -97,14 +97,14 @@
                         <span class="ms-2 d-block text-truncate" th:text="${file.objectName}"></span>
 
                         <!-- File Download -->
-                        <form th:action="@{/storage/download}" th:method="get"
-                              th:object="${fileRequest}">
-                            <input th:name="path" th:value="${file.path}" type="hidden">
-                            <input th:name="username" th:value="${username}" type="hidden">
-                            <input th:name="objectName" th:value="${file.objectName}" type="hidden">
-                            <button class="stretched-link" style="border: none"
-                                    type="submit"></button>
-                        </form>
+                        <!--                        <form th:action="@{/storage/download}" th:method="get"-->
+                        <!--                              th:object="${fileRequest}">-->
+                        <!--                            <input th:name="path" th:value="${file.path}" type="hidden">-->
+                        <!--                            <input th:name="username" th:value="${username}" type="hidden">-->
+                        <!--                            <input th:name="objectName" th:value="${file.objectName}" type="hidden">-->
+                        <!--                            <button class="stretched-link" style="border: none"-->
+                        <!--                                    type="submit"></button>-->
+                        <!--                        </form>-->
                     </div>
 
                     <!-- File Actions -->
@@ -120,10 +120,10 @@
 
                                 <!-- File Rename -->
                                 <li>
-                                    <button class="dropdown-item"
-                                            data-mdb-toggle="modal"
-                                            th:attr="data-mdb-target=|#rename-${fileStat.index}|">
-                                        Rename
+                                    <button class="dropdown-item" data-bs-toggle="modal"
+                                            data-bs-target="#rename"
+                                            th:attr="data-bs-target=|#rename-${fileStat.index}|">
+                                    Rename
                                     </button>
                                 </li>
 
@@ -143,12 +143,12 @@
                 </div>
 
                 <!-- File Rename Modal -->
-                                <div th:replace="parts/rename :: rename"></div>
+                <div th:replace="~{parts/rename :: rename}"></div>
 
             </div>
         </div>
     </div>
 </div>
-<div th:replace="parts/footer :: footer"></div>
+<div th:replace="~{parts/footer :: footer}"></div>
 </body>
 </html>
