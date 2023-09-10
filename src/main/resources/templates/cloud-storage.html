@@ -55,9 +55,9 @@
 
                                 <!-- Folder Rename -->
                                 <li>
-                                    <button class="dropdown-item"
-                                            data-mdb-toggle="modal"
-                                            >
+                                    <button class="dropdown-item" data-bs-toggle="modal"
+                                            data-bs-target="#rename"
+                                            th:attr="data-bs-target=|#rename-${fileStat.index}|">
                                         Rename
                                     </button>
                                 </li>
@@ -78,7 +78,7 @@
                 </div>
 
                 <!-- Folder Rename Modal -->
-<!--                <div th:replace="~{parts/rename :: rename}"></div>-->
+                <div th:replace="~{parts/rename :: rename}"></div>
 
             </div>
         </div>

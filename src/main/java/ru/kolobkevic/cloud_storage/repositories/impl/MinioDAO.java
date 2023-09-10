@@ -55,7 +55,7 @@ public class MinioDAO implements StorageDAO {
     @Override
     public List<StorageObject> getListOfObjects(String objectName, boolean isRecursive) {
         List<StorageObject> files = new ArrayList<>();
-        var minioObjects = getObjects(objectName, false);
+        var minioObjects = getObjects(objectName, isRecursive);
 
         try {
             for (var minioObject : minioObjects) {

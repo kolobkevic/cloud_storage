@@ -24,8 +24,8 @@ public class StorageService {
         return "user-" + username + "-files/";
     }
 
-    public List<StorageObject> getListOfObjects(String username, String objectName) {
-        return storageDAO.getListOfObjects(getUserFolderName(username) + getPathWithoutUsername(objectName));
+    public List<StorageObject> getListOfObjects(String username, String objectName, boolean isRecursive) {
+        return storageDAO.getListOfObjects(getUserFolderName(username) + getPathWithoutUsername(objectName), isRecursive);
     }
 
     private void uploadObject(String filePath, InputStream in) {
@@ -68,9 +68,11 @@ public class StorageService {
     }
 
     public void renameObject(String username, String oldName, String newName) {
-        storageDAO.renameObject(
-                getUserFolderName(username) + getPathWithoutUsername(oldName),
-                getUserFolderName(username) + getPathWithoutUsername(getPathWithNewFileName(oldName, newName)));
+        if (oldName.endsWith("/")) {
+            renameFolder(username, oldName, newName);
+        } else {
+            storageDAO.renameObject(oldName, getFileName(oldName, newName));
+        }
     }
 
     public ByteArrayResource downloadFile(String username, String objectName) {
@@ -89,7 +91,21 @@ public class StorageService {
         return path.substring(path.lastIndexOf("/") + 1);
     }
 
-    private String getPathWithNewFileName(String path, String newName) {
+    private String getFileName(String path, String newName) {
         return path.replace(getFileNameFromPath(path), newName);
+    }
+
+    private void renameFolder(String username, String oldName, String newName) {
+        var objects = getListOfObjects(username, oldName, true);
+        for (var obj : objects) {
+            var newPath = obj.getPath().replace(oldName, getNewPath(oldName, newName));
+            storageDAO.renameObject(obj.getPath(), newPath);
+        }
+    }
+
+    private String getNewPath(String path, String newPath) {
+        var splitted = path.split("/");
+        splitted[splitted.length - 1] = newPath;
+        return String.join("/", splitted) + "/";
     }
 }

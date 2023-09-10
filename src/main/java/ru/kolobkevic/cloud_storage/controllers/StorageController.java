@@ -35,7 +35,7 @@ public class StorageController {
                            Model model) {
         log.info("Path: " + path);
         model.addAttribute("breadCrumbs", storageService.getBreadCrumb(path));
-        model.addAttribute("files", storageService.getListOfObjects(user.getUsername(), path));
+        model.addAttribute("files", storageService.getListOfObjects(user.getUsername(), path, false));
         model.addAttribute("username", user.getUsername());
 
         return "cloud-storage";
@@ -52,6 +52,7 @@ public class StorageController {
         var username = fileRenameRequestDto.getUsername();
         var oldPath = fileRenameRequestDto.getPath();
         var newPath = fileRenameRequestDto.getNewPath();
+        var objectName = fileRenameRequestDto.getObjectName();
         storageService.renameObject(username, oldPath, newPath);
         return "redirect:/storage";
     }

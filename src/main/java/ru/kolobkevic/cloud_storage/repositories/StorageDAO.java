@@ -9,7 +9,7 @@ import java.util.List;
 
 @Component
 public interface StorageDAO {
-    List<StorageObject> getListOfObjects(String objectName);
+    List<StorageObject> getListOfObjects(String objectName, boolean isRecursive);
 
     void uploadObject(String filePath, InputStream in);
 
