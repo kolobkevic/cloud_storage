@@ -54,17 +54,8 @@ public class StorageService {
         storageDAO.createFolder(getUserFolderName(username) + folderName);
     }
 
-    public void copyObject(String username, String filePath, String newPath) {
-        storageDAO.copyObject(getUserFolderName(username) + filePath,
-                getUserFolderName(username) + newPath);
-    }
-
     public void removeObject(String username, String filePath) {
         storageDAO.removeObject(getUserFolderName(username) + getPathWithoutUsername(filePath));
-    }
-
-    public String getObjectUrl(String username, String objectName) {
-        return storageDAO.getObjectUrl(getUserFolderName(username) + objectName);
     }
 
     public void renameObject(String username, String oldName, String newName) {

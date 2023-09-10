@@ -21,7 +21,5 @@ public interface StorageDAO {
 
     void renameObject(String oldName, String newName);
 
-    String getObjectUrl(String objectName);
-
     ByteArrayResource downloadObject(String filePath);
 }

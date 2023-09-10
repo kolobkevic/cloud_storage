@@ -52,7 +52,6 @@ public class StorageController {
         var username = fileRenameRequestDto.getUsername();
         var oldPath = fileRenameRequestDto.getPath();
         var newPath = fileRenameRequestDto.getNewPath();
-        var objectName = fileRenameRequestDto.getObjectName();
         storageService.renameObject(username, oldPath, newPath);
         return "redirect:/storage";
     }

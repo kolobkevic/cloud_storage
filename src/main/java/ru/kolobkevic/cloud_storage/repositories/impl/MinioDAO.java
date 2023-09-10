@@ -1,9 +1,13 @@
 package ru.kolobkevic.cloud_storage.repositories.impl;
 
-import io.minio.*;
-import io.minio.errors.*;
-import io.minio.http.Method;
-import io.minio.messages.DeleteError;
+import io.minio.CopyObjectArgs;
+import io.minio.CopySource;
+import io.minio.GetObjectArgs;
+import io.minio.ListObjectsArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectsArgs;
+import io.minio.Result;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
@@ -11,20 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
 import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -151,24 +148,6 @@ public class MinioDAO implements StorageDAO {
     }
 
     @Override
-    public String getObjectUrl(String objectName) {
-        try {
-            return minioClient.getPresignedObjectUrl(
-                    GetPresignedObjectUrlArgs.builder()
-                            .method(Method.GET)
-                            .bucket(bucketName)
-                            .object(objectName)
-                            .expiry(1, TimeUnit.DAYS)
-                            .extraQueryParams(new HashMap<>(
-                                    Map.of("response-content-type", "application/octet-stream")))
-                            .build());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Could not get URL";
-        }
-    }
-
-    @Override
     public ByteArrayResource downloadObject(String filePath) {
         GetObjectArgs objectArgs = GetObjectArgs.builder()
                 .bucket(bucketName)
@@ -198,18 +177,5 @@ public class MinioDAO implements StorageDAO {
         } catch (Exception e) {
             throw new RuntimeException();
         }
-    }
-
-    private String getUrlForDirectory(String encodedSubDirectoryPath) {
-
-        return UriComponentsBuilder
-                .newInstance()
-                .scheme(schema)
-                .host(hostName)
-                .port(port)
-                .path("/")
-                .queryParam("path", encodedSubDirectoryPath)
-                .build()
-                .toUriString();
     }
 }
