@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import ru.kolobkevic.cloud_storage.dtos.FileDto;
+import ru.kolobkevic.cloud_storage.dtos.FilesDto;
 import ru.kolobkevic.cloud_storage.dtos.FileRenameRequestDto;
 import ru.kolobkevic.cloud_storage.dtos.FileRequestDto;
 import ru.kolobkevic.cloud_storage.services.StorageService;
@@ -37,13 +37,14 @@ public class StorageController {
         model.addAttribute("breadCrumbs", storageService.getBreadCrumb(path));
         model.addAttribute("files", storageService.getListOfObjects(user.getUsername(), path, false));
         model.addAttribute("username", user.getUsername());
+        model.addAttribute("path", path);
 
         return "cloud-storage";
     }
 
-    @PostMapping
-    public String uploadFile(@ModelAttribute("fileDto") FileDto fileDto) {
-        storageService.uploadFile(fileDto.getUsername(), fileDto.getFile(), fileDto.getFile().getName());
+    @PostMapping("/upload")
+    public String uploadFile(@ModelAttribute("filesDto") FilesDto filesDto) {
+        storageService.uploadFile(filesDto.getUsername(), filesDto.getFiles(), filesDto.getPath());
         return "redirect:/storage";
     }
 

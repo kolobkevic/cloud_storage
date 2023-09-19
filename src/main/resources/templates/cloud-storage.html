@@ -8,10 +8,17 @@
 
 <div class="container main">
 
-    <div class="files-list">
-        <div class="col-auto mt-5">
-            <h2>Cloud storage</h2>
-        </div>
+    <div class="col-auto mt-5">
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#fileUploadModal">
+            Upload file
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#folderUploadModal">
+            Upload folder
+        </button>
+
+        <!-- File Upload Modal -->
+        <div th:replace="~{parts/upload-file-modal :: file-upload-modal}"></div>
+        <div th:replace="~{parts/upload-folder-modal :: folder-upload-modal}"></div>
     </div>
 
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
@@ -78,7 +85,7 @@
                 </div>
 
                 <!-- Folder Rename Modal -->
-                <div th:replace="~{parts/rename :: rename}"></div>
+                <div th:replace="~{parts/rename-modal :: rename}"></div>
 
             </div>
         </div>
@@ -95,16 +102,6 @@
                     <div class="d-flex align-items-center w-75 position-relative">
                         <img alt="file" style="width: 2rem" th:src="@{/img/file.png}"/>
                         <span class="ms-2 d-block text-truncate" th:text="${file.objectName}"></span>
-
-                        <!-- File Download -->
-                        <!--                        <form th:action="@{/storage/download}" th:method="get"-->
-                        <!--                              th:object="${fileRequest}">-->
-                        <!--                            <input th:name="path" th:value="${file.path}" type="hidden">-->
-                        <!--                            <input th:name="username" th:value="${username}" type="hidden">-->
-                        <!--                            <input th:name="objectName" th:value="${file.objectName}" type="hidden">-->
-                        <!--                            <button class="stretched-link" style="border: none"-->
-                        <!--                                    type="submit"></button>-->
-                        <!--                        </form>-->
                     </div>
 
                     <!-- File Actions -->
@@ -118,12 +115,23 @@
 
                             <ul aria-labelledby="fileDropdown" class="dropdown-menu">
 
+                                <!--File Download -->
+                                <li>
+                                    <form th:action="@{/storage/download}" th:method="get"
+                                          th:object="${fileRequest}">
+                                        <input th:name="path" th:value="${file.path}" type="hidden">
+                                        <input th:name="username" th:value="${username}" type="hidden">
+                                        <input th:name="objectName" th:value="${file.objectName}" type="hidden">
+                                        <button class="dropdown-item" type="submit">Download</button>
+                                    </form>
+                                </li>
+
                                 <!-- File Rename -->
                                 <li>
                                     <button class="dropdown-item" data-bs-toggle="modal"
                                             data-bs-target="#rename"
                                             th:attr="data-bs-target=|#rename-${fileStat.index}|">
-                                    Rename
+                                        Rename
                                     </button>
                                 </li>
 
@@ -143,7 +151,7 @@
                 </div>
 
                 <!-- File Rename Modal -->
-                <div th:replace="~{parts/rename :: rename}"></div>
+                <div th:replace="~{parts/rename-modal :: rename}"></div>
 
             </div>
         </div>

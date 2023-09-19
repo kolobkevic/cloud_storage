@@ -26,8 +26,8 @@
             </form>
 
 
-            <div class="d-flex profile-link" th:if="${username}">
-                <a href="/profile" class="nav-link" th:text="${username}"></a>
+            <div class="d-flex" th:if="${username}">
+                <label th:text="${username}"></label>
             </div>
             <div class="d-flex" th:if="${username}">
                 <a href="/logout" class="nav-link">Выйти</a>

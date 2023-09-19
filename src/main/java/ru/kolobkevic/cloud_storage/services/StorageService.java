@@ -32,11 +32,14 @@ public class StorageService {
         storageDAO.uploadObject(filePath, in);
     }
 
-    public void uploadFile(String username, MultipartFile file, String filePath) {
-        try (var stream = file.getInputStream()) {
-            uploadObject(getUserFolderName(username) + filePath, stream);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void uploadFile(String username, List<MultipartFile> files, String path) {
+        for (var file : files) {
+            try (var stream = file.getInputStream()) {
+                var objName = path + file.getOriginalFilename();
+                uploadObject(objName, stream);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
