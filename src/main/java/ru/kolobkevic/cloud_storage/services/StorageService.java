@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.kolobkevic.cloud_storage.dtos.BreadCrumbDto;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
 import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,7 +28,14 @@ public class StorageService {
     }
 
     public List<StorageObject> getListOfObjects(String username, String objectName, boolean isRecursive) {
-        return storageDAO.getListOfObjects(getUserFolderName(username) + getPathWithoutUsername(objectName), isRecursive);
+        var allObjects = storageDAO.getListOfObjects(getUserFolderName(username) + getPathWithoutUsername(objectName), isRecursive);
+        List<StorageObject> objects = new ArrayList<>();
+        for (var obj : allObjects) {
+            if (!obj.getPath().equals(objectName) && !obj.getPath().equals(getUserFolderName(username))) {
+                objects.add(obj);
+            }
+        }
+        return objects;
     }
 
     private void uploadObject(String filePath, InputStream in) {
@@ -73,8 +83,15 @@ public class StorageService {
         return storageDAO.downloadObject(getUserFolderName(username) + getPathWithoutUsername(objectName));
     }
 
-    public List<String> getBreadCrumb(String path) {
-        return path.isEmpty() ? Collections.emptyList() : List.of(path.split("/"));
+    public List<BreadCrumbDto> getBreadCrumb(String path) {
+        var segments = Arrays.stream(path.split("/")).toList();
+        var breadCrumbList = new ArrayList<BreadCrumbDto>();
+
+        for (int i = 0; i < segments.size(); i++) {
+            breadCrumbList.add(new BreadCrumbDto(segments.subList(0, i + 1)));
+        }
+
+        return path.isEmpty() ? Collections.emptyList() : breadCrumbList;
     }
 
     private String getPathWithoutUsername(String path) {

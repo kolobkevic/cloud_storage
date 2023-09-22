@@ -34,7 +34,7 @@ public class StorageController {
                            @RequestParam(value = "path", required = false, defaultValue = "") String path,
                            Model model) {
         log.info("Path: " + path);
-        model.addAttribute("breadCrumbs", storageService.getBreadCrumb(path));
+        model.addAttribute("breadCrumbsList", storageService.getBreadCrumb(path));
         model.addAttribute("files", storageService.getListOfObjects(user.getUsername(), path, false));
         model.addAttribute("username", user.getUsername());
         model.addAttribute("path", path);
