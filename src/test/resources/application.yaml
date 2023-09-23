@@ -4,10 +4,6 @@ spring:
     username: clouduser
     password: secret
 
-  mvc:
-    hiddenmethod:
-      filter:
-        enabled: true
   jpa:
     show-sql: true
 
@@ -21,7 +17,3 @@ minio:
   access-key: minioadmin
   secret-key: minioadmin
   port: 9000
-url:
-  schema: http
-  host: localhost
-  port: 8080

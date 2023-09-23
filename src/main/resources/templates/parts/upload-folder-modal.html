@@ -1,0 +1,22 @@
+<div class="modal fade" aria-hidden="true" tabindex="-1" th:fragment="folder-upload-modal" id="folderUploadModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Folder upload</h5>
+                <button class="btn-close" aria-label="Close" data-mdb-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form enctype="multipart/form-data" id="folderUploadForm" method="post" th:action="@{/storage/upload}"
+                      th:object="${filesDto}">
+                    <input type="file" name="files" class="form-control" required webkitdirectory>
+                    <input th:name="path" th:value="${path}" type="hidden">
+                    <input th:name="username" th:value="${username}" type="hidden">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-mdb-dismiss="modal" type="button">Close</button>
+                <button class="btn btn-primary" form="folderUploadForm" type="submit">Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
