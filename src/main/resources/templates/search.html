@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="~{parts/header :: header}">
+</head>
+<body>
+<div th:replace="~{parts/navbar :: nav}"></div>
+
+<h2 th:if="${searchResults.isEmpty()}" class="container">Nothing was found</h2>
+
+<div th:unless="${searchResults.isEmpty()}" class="container">
+    <h2>Search results</h2>
+    <hr class="mt-1">
+
+    <div th:if="${searchResults}">
+        <h6 class="mb-3">Folders</h6>
+        <div class="row row-cols-1 row-cols-md-5 g-4">
+            <div class="col" th:each="file, fileStat : ${searchResults}" th:if="${file.isDir}">
+                <div class="card flex-row p-2 align-items-center justify-content-between shadow-4-strong">
+
+                    <!-- Folder Name -->
+                    <div class="d-flex align-items-center w-75 position-relative">
+                        <img alt="folder" style="width: 2rem" th:src="@{/img/folder.png}"/>
+                        <span class="ms-2 d-block text-truncate" th:text="${file.objectName}"></span>
+                        <a class="stretched-link" th:href="@{'storage?path=' + ${file.path}}"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5" th:if="${searchResults}">
+        <h6 class="mb-3">Files</h6>
+        <div class="row row-cols-1 row-cols-md-5 g-4">
+            <div class="col" th:each="file, fileStat : ${searchResults}" th:unless="${file.isDir}">
+                <div class="card flex-row p-2 align-items-center justify-content-between shadow-4-strong">
+
+                    <!-- File Name -->
+                    <div class="d-flex align-items-center w-75 position-relative">
+                        <img alt="file" style="width: 2rem" th:src="@{/img/file.png}"/>
+                        <span class="ms-2 d-block text-truncate" th:text="${file.objectName}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
