@@ -1,4 +1,4 @@
-package ru.kolobkevic.cloud_storage.entities;
+package ru.kolobkevic.cloud_storage.models;
 
 import jakarta.persistence.*;
 import lombok.Getter;
