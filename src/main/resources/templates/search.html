@@ -11,6 +11,7 @@
     <h2>Search results</h2>
     <hr class="mt-1">
 
+    <!-- Folders -->
     <div th:if="${searchResults}">
         <h6 class="mb-3">Folders</h6>
         <div class="row row-cols-1 row-cols-md-5 g-4">
@@ -28,6 +29,7 @@
         </div>
     </div>
 
+    <!-- Files -->
     <div class="mt-5" th:if="${searchResults}">
         <h6 class="mb-3">Files</h6>
         <div class="row row-cols-1 row-cols-md-5 g-4">
@@ -39,6 +41,54 @@
                         <img alt="file" style="width: 2rem" th:src="@{/img/file.png}"/>
                         <span class="ms-2 d-block text-truncate" th:text="${file.objectName}"></span>
                     </div>
+
+                    <!-- File Actions -->
+                    <div>
+                        <div class="dropdown">
+                            <button aria-expanded="false" class="bg-white"
+                                    data-bs-toggle="dropdown" id="fileDropdown"
+                                    style="border: none; width: 2.5rem; :after" type="button">
+                                <img class="w-50" th:src="@{/img/more.png}"/>
+                            </button>
+
+                            <ul aria-labelledby="fileDropdown" class="dropdown-menu">
+
+                                <!--File Download -->
+                                <li>
+                                    <form th:action="@{/storage/download}" th:method="get"
+                                          th:object="${fileRequest}">
+                                        <input th:name="path" th:value="${file.path}" type="hidden">
+                                        <input th:name="username" th:value="${username}" type="hidden">
+                                        <input th:name="objectName" th:value="${file.objectName}" type="hidden">
+                                        <button class="dropdown-item" type="submit">Download</button>
+                                    </form>
+                                </li>
+
+                                <!-- File Rename -->
+                                <li>
+                                    <button class="dropdown-item" data-bs-toggle="modal"
+                                            data-bs-target="#rename"
+                                            th:attr="data-bs-target=|#rename-${fileStat.index}|">
+                                        Rename
+                                    </button>
+                                </li>
+
+                                <!-- File Delete -->
+                                <li>
+                                    <form th:action="@{/storage}" th:method="delete"
+                                          th:object="${fileRequest}">
+                                        <input th:name="path" th:value="${file.path}" type="hidden">
+                                        <input th:name="username" th:value="${username}" type="hidden">
+                                        <input th:name="objectName" th:value="${file.objectName}" type="hidden">
+                                        <button class="dropdown-item" type="submit">Delete</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- File Rename Modal -->
+                    <div th:replace="~{parts/rename-modal :: rename}"></div>
                 </div>
             </div>
         </div>

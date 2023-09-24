@@ -66,11 +66,12 @@ public class StorageController {
     @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
     public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto) {
-        var fileName = fileRequestDto.getPath();
+        var objectName = fileRequestDto.getPath();
         var userName = fileRequestDto.getUsername();
-        var file = storageService.downloadFile(userName, fileName);
+        var filename = fileRequestDto.getObjectName();
+        var file = storageService.downloadFile(userName, objectName);
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=" + fileName)
+                .header("Content-Disposition", "attachment; filename=" + filename)
                 .body(file);
     }
 }

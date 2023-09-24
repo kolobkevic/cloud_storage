@@ -2,7 +2,10 @@ package ru.kolobkevic.cloud_storage.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import ru.kolobkevic.cloud_storage.models.User;
 import ru.kolobkevic.cloud_storage.services.StorageService;
 import ru.kolobkevic.cloud_storage.services.UserService;
@@ -28,7 +31,7 @@ public class RegistrationController {
         catch (Exception e) {
             return "auth/registration";
         }
-        return "redirect:/";
+        return "redirect:auth/login";
     }
 
     @GetMapping("/login")
