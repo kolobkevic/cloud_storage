@@ -21,17 +21,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(AbstractHttpConfigurer::disable)
-//                .csrf(AbstractHttpConfigurer::disable)
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/auth/registration"))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/auth/login", "/auth/registration").permitAll()
+                        .requestMatchers("/auth/login", "/auth/registration").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin.permitAll()
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/perform-login")
-                        .defaultSuccessUrl("/"))
-                .logout(logout -> logout.logoutUrl("/logout").permitAll());
+                        .defaultSuccessUrl("/storage", true))
+                .logout(logout -> logout.logoutUrl("/logout")
+                        .logoutSuccessUrl("/auth/login")
+                        .permitAll());
         return http.build();
     }
 }
