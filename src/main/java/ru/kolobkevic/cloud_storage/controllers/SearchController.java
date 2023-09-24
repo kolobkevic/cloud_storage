@@ -22,6 +22,7 @@ public class SearchController {
                                       Model model) {
         var results = searchService.search(user.getUsername(), query);
         model.addAttribute("searchResults", results);
+        model.addAttribute("username", user.getUsername());
         return "search";
     }
 }
