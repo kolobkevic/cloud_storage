@@ -30,7 +30,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/perform-login")
                         .defaultSuccessUrl("/storage", true))
                 .logout(logout -> logout.logoutUrl("/logout")
-                        .logoutSuccessUrl("/auth/login")
+                        .logoutSuccessUrl("/")
                         .permitAll());
         return http.build();
     }

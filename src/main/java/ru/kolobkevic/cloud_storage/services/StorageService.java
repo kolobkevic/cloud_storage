@@ -43,6 +43,9 @@ public class StorageService {
     }
 
     public void uploadFile(String username, List<MultipartFile> files, String path) {
+        if (path.isEmpty()){
+            path = getUserFolderName(username);
+        }
         for (var file : files) {
             try (var stream = file.getInputStream()) {
                 var objName = path + file.getOriginalFilename();
