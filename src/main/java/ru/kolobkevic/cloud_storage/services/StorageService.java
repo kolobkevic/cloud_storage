@@ -90,7 +90,7 @@ public class StorageService {
         var segments = Arrays.stream(path.split("/")).toList();
         var breadCrumbList = new ArrayList<BreadCrumbDto>();
 
-        for (int i = 0; i < segments.size(); i++) {
+        for (int i = 1; i < segments.size(); i++) {
             breadCrumbList.add(new BreadCrumbDto(segments.subList(0, i + 1)));
         }
 
