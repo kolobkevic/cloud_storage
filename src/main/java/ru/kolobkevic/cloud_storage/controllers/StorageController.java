@@ -64,7 +64,7 @@ public class StorageController {
     }
 
     @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @ResponseBody
+
     public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto) {
         var objectName = fileRequestDto.getPath();
         var userName = fileRequestDto.getUsername();

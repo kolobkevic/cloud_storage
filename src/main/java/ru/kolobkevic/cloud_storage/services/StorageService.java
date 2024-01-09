@@ -28,10 +28,12 @@ public class StorageService {
     }
 
     public List<StorageObject> getListOfObjects(String username, String objectName, boolean isRecursive) {
-        var allObjects = storageDAO.getListOfObjects(getUserFolderName(username) + getPathWithoutUsername(objectName), isRecursive);
+        var objName = getUserFolderName(username) + objectName;
+        var allObjects = storageDAO.getListOfObjects(objName, isRecursive);
         List<StorageObject> objects = new ArrayList<>();
         for (var obj : allObjects) {
-            if (!obj.getPath().equals(objectName) && !obj.getPath().equals(getUserFolderName(username))) {
+            if (!obj.getPath().equals(objName) && !obj.getPath().equals(getUserFolderName(username))) {
+                obj.setPath(getPathWithoutUsername(obj.getPath()));
                 objects.add(obj);
             }
         }
@@ -90,7 +92,7 @@ public class StorageService {
         var segments = Arrays.stream(path.split("/")).toList();
         var breadCrumbList = new ArrayList<BreadCrumbDto>();
 
-        for (int i = 1; i < segments.size(); i++) {
+        for (int i = 0; i < segments.size(); i++) {
             breadCrumbList.add(new BreadCrumbDto(segments.subList(0, i + 1)));
         }
 
