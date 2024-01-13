@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.exceptions.UserAlreadyExistsException;
 import ru.kolobkevic.cloud_storage.models.User;
 import ru.kolobkevic.cloud_storage.services.StorageService;
@@ -27,7 +28,8 @@ public class RegistrationController {
     }
 
     @PostMapping("/registration")
-    public String register(@ModelAttribute("user") User user, BindingResult bindingResult) {
+    public String register(@ModelAttribute("user") User user, BindingResult bindingResult)
+            throws StorageServerException {
         try {
             userService.create(user);
             storageService.createUserFolder(user.getEmail());
