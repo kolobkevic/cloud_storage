@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.services.SearchService;
 
 @Controller
@@ -19,7 +20,7 @@ public class SearchController {
     @GetMapping
     public String search(@AuthenticationPrincipal User user,
                                       @RequestParam("query") String query,
-                                      Model model) {
+                                      Model model) throws StorageServerException {
         var results = searchService.search(user.getUsername(), query);
         model.addAttribute("searchResults", results);
         model.addAttribute("username", user.getUsername());
