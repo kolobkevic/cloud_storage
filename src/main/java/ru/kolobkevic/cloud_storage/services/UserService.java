@@ -1,12 +1,14 @@
 package ru.kolobkevic.cloud_storage.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.kolobkevic.cloud_storage.exceptions.UserAlreadyExistsException;
 import ru.kolobkevic.cloud_storage.models.User;
 import ru.kolobkevic.cloud_storage.repositories.UserRepository;
 
@@ -29,9 +31,16 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    public User create(User user){
+    public User create(User user) throws UserAlreadyExistsException {
         encodeUserPassword(user);
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            var message = e.getMessage().split("'");
+            if (user.getEmail().equals(message[1])) {
+                throw new UserAlreadyExistsException("Email is not unique");
+            } else throw e;
+        }
     }
 
     private void encodeUserPassword(User user) {

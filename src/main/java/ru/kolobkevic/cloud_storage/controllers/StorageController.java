@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import ru.kolobkevic.cloud_storage.dtos.FilesDto;
 import ru.kolobkevic.cloud_storage.dtos.FileRenameRequestDto;
 import ru.kolobkevic.cloud_storage.dtos.FileRequestDto;
+import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
+import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.services.StorageService;
 
 @Controller
@@ -32,10 +33,11 @@ public class StorageController {
     @GetMapping
     public String getFiles(@AuthenticationPrincipal User user,
                            @RequestParam(value = "path", required = false, defaultValue = "") String path,
-                           Model model) {
+                           Model model) throws StorageServerException {
         log.info("Path: " + path);
         model.addAttribute("breadCrumbsList", storageService.getBreadCrumb(path));
-        model.addAttribute("files", storageService.getListOfObjects(user.getUsername(), path, false));
+        model.addAttribute("files", storageService.getListOfObjects(user.getUsername(),
+                path, false));
         model.addAttribute("username", user.getUsername());
         model.addAttribute("path", path);
 
@@ -43,13 +45,14 @@ public class StorageController {
     }
 
     @PostMapping("/upload")
-    public String uploadFile(@ModelAttribute("filesDto") FilesDto filesDto) {
+    public String uploadFile(@ModelAttribute("filesDto") FilesDto filesDto) throws StorageServerException {
         storageService.uploadFile(filesDto.getUsername(), filesDto.getFiles(), filesDto.getPath());
         return "redirect:/storage";
     }
 
     @PutMapping
-    public String renameFile(@ModelAttribute("fileRenameRequest") FileRenameRequestDto fileRenameRequestDto) {
+    public String renameFile(@ModelAttribute("fileRenameRequest") FileRenameRequestDto fileRenameRequestDto)
+            throws ObjectAlreadyExistsException, StorageServerException {
         var username = fileRenameRequestDto.getUsername();
         var oldPath = fileRenameRequestDto.getPath();
         var newPath = fileRenameRequestDto.getNewPath();
@@ -58,14 +61,16 @@ public class StorageController {
     }
 
     @DeleteMapping
-    public String deleteFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto) {
+    public String deleteFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto)
+            throws StorageServerException {
         storageService.removeObject(fileRequestDto.getUsername(), fileRequestDto.getPath());
         return "redirect:/storage";
     }
 
     @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 
-    public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto) {
+    public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto)
+            throws StorageServerException {
         var objectName = fileRequestDto.getPath();
         var userName = fileRequestDto.getUsername();
         var filename = fileRequestDto.getObjectName();
