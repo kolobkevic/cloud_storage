@@ -19,3 +19,12 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+  redis:
+    container_name: redis
+    image: redis:latest
+    command: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - ~/data/redis:/var/lib/redis
+      - ~/data/redis/config:/usr/local/etc/redis/redis.conf
