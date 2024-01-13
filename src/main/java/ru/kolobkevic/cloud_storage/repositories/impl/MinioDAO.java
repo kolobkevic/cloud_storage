@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Component;
+import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
 import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
 
@@ -50,7 +51,7 @@ public class MinioDAO implements StorageDAO {
     }
 
     @Override
-    public List<StorageObject> getListOfObjects(String objectName, boolean isRecursive) {
+    public List<StorageObject> getListOfObjects(String objectName, boolean isRecursive) throws StorageServerException {
         List<StorageObject> files = new ArrayList<>();
         var minioObjects = getObjects(objectName, isRecursive);
 
@@ -69,13 +70,13 @@ public class MinioDAO implements StorageDAO {
                 files.add(new StorageObject(displayName, path, isDir));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new StorageServerException(e.getMessage());
         }
         return files;
     }
 
     @Override
-    public void uploadObject(String filePath, InputStream in) {
+    public void uploadObject(String filePath, InputStream in) throws StorageServerException {
         log.info("Uploading objects with name " + filePath + " from bucket " + bucketName);
         try {
             minioClient.putObject(PutObjectArgs.builder()
@@ -84,12 +85,12 @@ public class MinioDAO implements StorageDAO {
                     .stream(in, -1, PART_SIZE)
                     .build());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new StorageServerException(e.getMessage());
         }
     }
 
     @Override
-    public void createFolder(String filePath) {
+    public void createFolder(String filePath) throws StorageServerException {
         log.info("Creating folder with name " + filePath + " from bucket " + bucketName);
         try {
             minioClient.putObject(PutObjectArgs.builder()
@@ -98,12 +99,12 @@ public class MinioDAO implements StorageDAO {
                     .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
                     .build());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new StorageServerException(e.getMessage());
         }
     }
 
     @Override
-    public void copyObject(String filePath, String newPath) {
+    public void copyObject(String filePath, String newPath) throws StorageServerException {
         log.info("Copying objects from " + filePath + " to " + newPath + " from bucket " + bucketName);
         try {
             minioClient.copyObject(
@@ -117,12 +118,12 @@ public class MinioDAO implements StorageDAO {
                                             .build())
                             .build());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new StorageServerException(e.getMessage());
         }
     }
 
     @Override
-    public void removeObject(String filePath) {
+    public void removeObject(String filePath) throws StorageServerException {
         var objects = prepareForDelete(filePath);
 
         var deleteResults = minioClient.removeObjects(
@@ -136,19 +137,20 @@ public class MinioDAO implements StorageDAO {
                 var error = obj.get();
                 log.warn("Error in deleting object " + error.objectName() + "; " + error.message());
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new StorageServerException(e.getMessage());
             }
         }
     }
 
     @Override
-    public void renameObject(String oldName, String newName) {
+    public void renameObject(String oldName, String newName) throws StorageServerException {
+
         copyObject(oldName, newName);
         removeObject(oldName);
     }
 
     @Override
-    public ByteArrayResource downloadObject(String filePath) {
+    public ByteArrayResource downloadObject(String filePath) throws StorageServerException {
         GetObjectArgs objectArgs = GetObjectArgs.builder()
                 .bucket(bucketName)
                 .object(filePath)
@@ -156,7 +158,7 @@ public class MinioDAO implements StorageDAO {
         try (var object = minioClient.getObject(objectArgs)) {
             return new ByteArrayResource(object.readAllBytes());
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new StorageServerException(e.getMessage());
         }
     }
 
@@ -165,7 +167,7 @@ public class MinioDAO implements StorageDAO {
         return splitted[splitted.length - 1];
     }
 
-    private List<DeleteObject> prepareForDelete(String filePath) {
+    private List<DeleteObject> prepareForDelete(String filePath) throws StorageServerException {
         var objects = getObjects(filePath, true);
         List<DeleteObject> objectsForDelete = new ArrayList<>();
 
@@ -175,7 +177,7 @@ public class MinioDAO implements StorageDAO {
             }
             return objectsForDelete;
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new StorageServerException(e.getMessage());
         }
     }
 }

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="EN">
+<head th:replace="~{parts/header :: header}">
+</head>
+<body>
+<div th:replace="~{parts/navbar :: nav}"></div>
+
+<div class="container">
+    <h2 class="mb-3">Возникла внутренняя ошибка сервера.</h2>
+    <a th:href="@{/storage}" class="link-primary">На главную</a>
+</div>
+
+</body>
+</html>
