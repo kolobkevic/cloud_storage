@@ -29,6 +29,7 @@ import ru.kolobkevic.cloud_storage.services.StorageService;
 @Slf4j
 public class StorageController {
     private final StorageService storageService;
+    private static final String HOME_PAGE_REDIRECTION = "redirect:/storage";
 
     @GetMapping
     public String getFiles(@AuthenticationPrincipal User user,
@@ -47,7 +48,7 @@ public class StorageController {
     @PostMapping("/upload")
     public String uploadFile(@ModelAttribute("filesDto") FilesDto filesDto) throws StorageServerException {
         storageService.uploadFile(filesDto.getUsername(), filesDto.getFiles(), filesDto.getPath());
-        return "redirect:/storage";
+        return HOME_PAGE_REDIRECTION;
     }
 
     @PutMapping
@@ -57,14 +58,14 @@ public class StorageController {
         var oldPath = fileRenameRequestDto.getPath();
         var newPath = fileRenameRequestDto.getNewPath();
         storageService.renameObject(username, oldPath, newPath);
-        return "redirect:/storage";
+        return HOME_PAGE_REDIRECTION;
     }
 
     @DeleteMapping
     public String deleteFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto)
             throws StorageServerException {
         storageService.removeObject(fileRequestDto.getUsername(), fileRequestDto.getPath());
-        return "redirect:/storage";
+        return HOME_PAGE_REDIRECTION;
     }
 
     @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
