@@ -1,8 +1,10 @@
 package ru.kolobkevic.cloud_storage.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,25 +23,29 @@ import ru.kolobkevic.cloud_storage.services.UserService;
 public class RegistrationController {
     private final UserService userService;
     private final StorageService storageService;
+    private static final String REGISTRATION_PAGE = "auth/registration";
 
     @GetMapping("/registration")
-    public String showRegistrationPage() {
-        return "auth/registration";
+    public String showRegistrationPage(Model model) {
+        model.addAttribute("user", new User());
+        return REGISTRATION_PAGE;
     }
 
     @PostMapping("/registration")
-    public String register(@ModelAttribute("user") User user, BindingResult bindingResult)
+    public String register(@ModelAttribute("user") @Valid User user, BindingResult bindingResult)
             throws StorageServerException {
+        if (bindingResult.hasErrors()) {
+            return REGISTRATION_PAGE;
+        }
+
         try {
             userService.create(user);
             storageService.createUserFolder(user.getEmail());
         } catch (UserAlreadyExistsException e) {
-            log.debug("Sign up failed for user \"{}\"", user.getEmail(), e);
+            log.debug("Sign up failed for user " + user.getEmail());
             bindingResult.rejectValue("email", "user already exists",
                     "User with this email already exists");
-        }
-        if (bindingResult.hasErrors()) {
-            return "auth/registration";
+            return REGISTRATION_PAGE;
         }
         return "redirect:auth/login";
     }
