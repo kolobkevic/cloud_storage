@@ -2,12 +2,13 @@ services:
   db:
     image: 'mysql:latest'
     environment:
-      - 'MYSQL_DATABASE=clouddb'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=clouduser'
+      MYSQL_DATABASE: clouddb
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: verysecret
+      MYSQL_USER: clouduser
     ports:
       - '3307:3306'
+
   minio:
     image: minio/minio:latest
     command: server --console-address ":9001" /data/
