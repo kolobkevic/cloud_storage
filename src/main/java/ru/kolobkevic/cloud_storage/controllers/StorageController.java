@@ -25,13 +25,13 @@ import ru.kolobkevic.cloud_storage.services.StorageService;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/storage")
+
 @Slf4j
 public class StorageController {
     private final StorageService storageService;
     private static final String HOME_PAGE_REDIRECTION = "redirect:/storage";
 
-    @GetMapping
+    @GetMapping("/storage")
     public String getFiles(@AuthenticationPrincipal User user,
                            @RequestParam(value = "path", required = false, defaultValue = "") String path,
                            Model model) throws StorageServerException {
@@ -45,13 +45,13 @@ public class StorageController {
         return "cloud-storage";
     }
 
-    @PostMapping("/upload")
+    @PostMapping("/storage/upload")
     public String uploadFile(@ModelAttribute("filesDto") FilesDto filesDto) throws StorageServerException {
         storageService.uploadFile(filesDto.getUsername(), filesDto.getFiles(), filesDto.getPath());
         return HOME_PAGE_REDIRECTION;
     }
 
-    @PutMapping
+    @PutMapping("/storage")
     public String renameFile(@ModelAttribute("fileRenameRequest") FileRenameRequestDto fileRenameRequestDto)
             throws ObjectAlreadyExistsException, StorageServerException {
         var username = fileRenameRequestDto.getUsername();
@@ -61,14 +61,14 @@ public class StorageController {
         return HOME_PAGE_REDIRECTION;
     }
 
-    @DeleteMapping
+    @DeleteMapping("/storage")
     public String deleteFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto)
             throws StorageServerException {
         storageService.removeObject(fileRequestDto.getUsername(), fileRequestDto.getPath());
         return HOME_PAGE_REDIRECTION;
     }
 
-    @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/storage/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 
     public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto)
             throws StorageServerException {
@@ -79,5 +79,15 @@ public class StorageController {
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=" + filename)
                 .body(file);
+    }
+
+    @GetMapping("/search")
+    public String search(@AuthenticationPrincipal User user,
+                         @RequestParam("query") String query,
+                         Model model) throws StorageServerException {
+        var results = storageService.search(user.getUsername(), query);
+        model.addAttribute("searchResults", results);
+        model.addAttribute("username", user.getUsername());
+        return "search";
     }
 }

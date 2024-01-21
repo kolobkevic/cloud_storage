@@ -138,4 +138,11 @@ public class StorageService {
         splitted[splitted.length - 1] = newPath;
         return String.join("/", splitted) + "/";
     }
+
+    public List<StorageObject> search(String username, String query) throws StorageServerException {
+        var objects = getListOfObjects(username, "", true);
+        return objects.stream()
+                .filter(obj -> obj.getObjectName().toLowerCase().contains(query.toLowerCase()))
+                .toList();
+    }
 }

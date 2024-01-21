@@ -8,19 +8,6 @@
 
 <div class="container main">
 
-    <div class="col-auto mt-5">
-        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#fileUploadModal">
-            Upload file
-        </button>
-        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#folderUploadModal">
-            Upload folder
-        </button>
-
-        <!-- File Upload Modal -->
-        <div th:replace="~{parts/upload-file-modal :: file-upload-modal}"></div>
-        <div th:replace="~{parts/upload-folder-modal :: folder-upload-modal}"></div>
-    </div>
-
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -34,6 +21,19 @@
             </li>
         </ol>
     </nav>
+
+    <div class="col-auto mt-5">
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#fileUploadModal">
+            Upload file
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#folderUploadModal">
+            Upload folder
+        </button>
+
+        <!-- File Upload Modal -->
+        <div th:replace="~{parts/upload-file-modal :: file-upload-modal}"></div>
+        <div th:replace="~{parts/upload-folder-modal :: folder-upload-modal}"></div>
+    </div>
 
     <div th:if="${files}">
         <h6 class="mb-3">Folders</h6>
