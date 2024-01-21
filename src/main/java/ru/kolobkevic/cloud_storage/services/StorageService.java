@@ -55,7 +55,7 @@ public class StorageService {
             try (var stream = file.getInputStream()) {
                 var objName = path + file.getOriginalFilename();
                 checkFileName(username, objName);
-                uploadObject(objName, stream);
+                uploadObject(getUserFolderName(username) + objName, stream);
             } catch (Exception e) {
                 throw new StorageServerException(e.getMessage());
             }
