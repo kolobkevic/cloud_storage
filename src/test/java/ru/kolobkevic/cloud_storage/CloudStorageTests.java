@@ -1,23 +1,10 @@
 package ru.kolobkevic.cloud_storage;
 
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.errors.ErrorResponseException;
-import io.minio.errors.InsufficientDataException;
-import io.minio.errors.InternalException;
-import io.minio.errors.InvalidResponseException;
-import io.minio.errors.ServerException;
-import io.minio.errors.XmlParserException;
-import org.hibernate.cfg.Environment;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MinIOContainer;
@@ -26,9 +13,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.services.StorageService;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
