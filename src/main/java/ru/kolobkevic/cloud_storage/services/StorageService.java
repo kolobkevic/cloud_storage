@@ -35,7 +35,12 @@ public class StorageService {
         var allObjects = storageDAO.getListOfObjects(objName, isRecursive);
         List<StorageObject> objects = new ArrayList<>();
         for (var obj : allObjects) {
-            if (!obj.getPath().equals(objName) && !obj.getPath().equals(getUserFolderName(username))) {
+            if(obj.isDir()) {
+                if (!obj.getPath().equals(objName) && !obj.getPath().equals(getUserFolderName(username))) {
+                    obj.setPath(getPathWithoutUsername(obj.getPath()));
+                    objects.add(obj);
+                }
+            } else {
                 obj.setPath(getPathWithoutUsername(obj.getPath()));
                 objects.add(obj);
             }
@@ -83,11 +88,14 @@ public class StorageService {
     public void renameObject(String username, String oldName, String newName)
             throws ObjectAlreadyExistsException, StorageServerException {
         if (oldName.endsWith("/")) {
+            newName = getNewPath(oldName, newName);
+            checkFileName(username, newName);
+            createFolder(username, newName);
             renameFolder(username, oldName, newName);
         } else {
+            newName = getFileName(oldName, newName);
             checkFileName(username, newName);
-            var newF = getFileName(oldName, newName);
-            storageDAO.renameObject(getUserFolderName(username) + oldName, getUserFolderName(username) + newF);
+            storageDAO.renameObject(getUserFolderName(username) + oldName, getUserFolderName(username) + newName);
         }
     }
 
@@ -129,9 +137,10 @@ public class StorageService {
     private void renameFolder(String username, String oldName, String newName) throws StorageServerException {
         var objects = getListOfObjects(username, oldName, true);
         for (var obj : objects) {
-            var newPath = obj.getPath().replace(oldName, getNewPath(oldName, newName));
-            storageDAO.renameObject(obj.getPath(), newPath);
+            var newPath = obj.getPath().replace(oldName, newName);
+            storageDAO.renameObject(getUserFolderName(username) + obj.getPath(), getUserFolderName(username) + newPath);
         }
+        storageDAO.removeObject(getUserFolderName(username) + oldName);
     }
 
     private String getNewPath(String path, String newPath) {
