@@ -77,7 +77,7 @@ public class StorageService {
     }
 
     public void removeObject(String username, String filePath) throws StorageServerException {
-        storageDAO.removeObject(getUserFolderName(username) + getPathWithoutUsername(filePath));
+        storageDAO.removeObject(getUserFolderName(username) + filePath);
     }
 
     public void renameObject(String username, String oldName, String newName)
@@ -86,20 +86,21 @@ public class StorageService {
             renameFolder(username, oldName, newName);
         } else {
             checkFileName(username, newName);
-            storageDAO.renameObject(oldName, getFileName(oldName, newName));
+            var newF = getFileName(oldName, newName);
+            storageDAO.renameObject(getUserFolderName(username) + oldName, getUserFolderName(username) + newF);
         }
     }
 
     private void checkFileName(String username, String filename)
             throws ObjectAlreadyExistsException, StorageServerException {
         var objects = getListOfObjects(username, filename, false);
-        if (objects.isEmpty()) {
+        if (!objects.isEmpty()) {
             throw new ObjectAlreadyExistsException(filename);
         }
     }
 
     public ByteArrayResource downloadFile(String username, String objectName) throws StorageServerException {
-        return storageDAO.downloadObject(getUserFolderName(username) + getPathWithoutUsername(objectName));
+        return storageDAO.downloadObject(getUserFolderName(username) + objectName);
     }
 
     public List<BreadCrumbDto> getBreadCrumb(String path) {
