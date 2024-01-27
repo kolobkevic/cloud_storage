@@ -29,10 +29,14 @@
         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#folderUploadModal">
             Upload folder
         </button>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
+            Create folder
+        </button>
 
-        <!-- File Upload Modal -->
+        <!-- File Create and Upload Modal -->
         <div th:replace="~{parts/upload-file-modal :: file-upload-modal}"></div>
         <div th:replace="~{parts/upload-folder-modal :: folder-upload-modal}"></div>
+        <div th:replace="~{parts/create-folder-modal :: create-folder-modal}"></div>
     </div>
 
     <div th:if="${files}">

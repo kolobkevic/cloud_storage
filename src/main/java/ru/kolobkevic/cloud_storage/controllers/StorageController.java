@@ -89,4 +89,10 @@ public class StorageController {
         model.addAttribute("username", user.getUsername());
         return "search";
     }
+
+    @PostMapping("/storage/create")
+    public String createFolder(@ModelAttribute("fileRequest") FileRenameRequestDto fileRenameRequestDto) throws StorageServerException {
+        storageService.createFolder(fileRenameRequestDto.getUsername(), fileRenameRequestDto.getNewPath());
+        return HOME_PAGE_REDIRECTION;
+    }
 }
