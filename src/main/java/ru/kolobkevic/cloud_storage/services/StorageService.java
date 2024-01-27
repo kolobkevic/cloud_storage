@@ -35,7 +35,7 @@ public class StorageService {
         var allObjects = storageDAO.getListOfObjects(objName, isRecursive);
         List<StorageObject> objects = new ArrayList<>();
         for (var obj : allObjects) {
-            if(obj.isDir()) {
+            if (obj.isDir()) {
                 if (!obj.getPath().equals(objName) && !obj.getPath().equals(getUserFolderName(username))) {
                     obj.setPath(getPathWithoutUsername(obj.getPath()));
                     objects.add(obj);
@@ -78,6 +78,7 @@ public class StorageService {
     }
 
     public void createFolder(String username, String folderName) throws StorageServerException {
+        folderName = folderName.endsWith("/") ? folderName : (folderName + "/");
         storageDAO.createFolder(getUserFolderName(username) + folderName);
     }
 
@@ -154,5 +155,10 @@ public class StorageService {
         return objects.stream()
                 .filter(obj -> obj.getObjectName().toLowerCase().contains(query.toLowerCase()))
                 .toList();
+    }
+
+    public String getParentPath(String path) {
+        path = path.substring(0, path.lastIndexOf('/'));
+        return path.substring(0, path.lastIndexOf('/') + 1);
     }
 }
