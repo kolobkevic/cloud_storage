@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Component;
+import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
 import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
@@ -51,9 +52,13 @@ public class MinioDAO implements StorageDAO {
     }
 
     @Override
-    public List<StorageObject> getListOfObjects(String objectName, boolean isRecursive) throws StorageServerException {
+    public List<StorageObject> getListOfObjects(String objectName, boolean isRecursive) throws StorageServerException, StorageObjectNotFoundException {
         List<StorageObject> files = new ArrayList<>();
         var minioObjects = getObjects(objectName, isRecursive);
+
+        if(!minioObjects.iterator().hasNext()){
+            throw new StorageObjectNotFoundException("No such file or folder");
+        }
 
         try {
             for (var minioObject : minioObjects) {

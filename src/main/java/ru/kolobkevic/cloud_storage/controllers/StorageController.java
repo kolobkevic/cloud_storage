@@ -20,12 +20,10 @@ import ru.kolobkevic.cloud_storage.dtos.FileRenameRequestDto;
 import ru.kolobkevic.cloud_storage.dtos.FileRequestDto;
 import ru.kolobkevic.cloud_storage.dtos.FolderRenameDto;
 import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
+import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.services.StorageService;
 import ru.kolobkevic.cloud_storage.utils.RedirectUtils;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,13 +32,12 @@ import java.nio.charset.StandardCharsets;
 public class StorageController {
     private final StorageService storageService;
     private final RedirectUtils redirectUtils;
-    private static final String HOME_PAGE_REDIRECTION = "redirect:/storage";
     private static final String PAGE_REDIRECTION_PREFIX = "redirect:/storage?path=";
 
     @GetMapping("/storage")
     public String getFiles(@AuthenticationPrincipal User user,
                            @RequestParam(value = "path", required = false, defaultValue = "") String path,
-                           Model model) throws StorageServerException {
+                           Model model) throws StorageServerException, StorageObjectNotFoundException {
         log.info("Path: " + path);
         model.addAttribute("breadCrumbsList", storageService.getBreadCrumb(path));
         model.addAttribute("files", storageService.getListOfObjects(user.getUsername(),
@@ -60,7 +57,7 @@ public class StorageController {
 
     @PutMapping("/storage")
     public String renameFile(@ModelAttribute("fileRenameRequest") FileRenameRequestDto fileRenameRequestDto)
-            throws ObjectAlreadyExistsException, StorageServerException {
+            throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
         var username = fileRenameRequestDto.getUsername();
         var oldPath = fileRenameRequestDto.getPath();
         var newPath = fileRenameRequestDto.getNewPath();
@@ -93,7 +90,7 @@ public class StorageController {
     @GetMapping("/search")
     public String search(@AuthenticationPrincipal User user,
                          @RequestParam("query") String query,
-                         Model model) throws StorageServerException {
+                         Model model) throws StorageServerException, StorageObjectNotFoundException {
         var results = storageService.search(user.getUsername(), query);
         model.addAttribute("searchResults", results);
         model.addAttribute("username", user.getUsername());

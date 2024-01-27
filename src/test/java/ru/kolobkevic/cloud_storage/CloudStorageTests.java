@@ -10,6 +10,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MinIOContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.services.StorageService;
 
@@ -50,7 +51,7 @@ class CloudStorageTests {
     }
 
     @Test
-    void folderFoundWhenCreated() throws StorageServerException {
+    void folderFoundWhenCreated() throws StorageServerException, StorageObjectNotFoundException {
         storageService.createFolder(username, "folder");
         assertEquals(1, storageService.search(username, "folder").size());
 

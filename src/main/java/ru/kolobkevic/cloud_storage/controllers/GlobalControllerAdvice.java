@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
+import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 
 @ControllerAdvice
@@ -19,5 +20,11 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(StorageServerException.class)
     public String storageServerException() {
         return "error500";
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(StorageObjectNotFoundException.class)
+    public String storageObjectNotFoundException() {
+        return "error404";
     }
 }

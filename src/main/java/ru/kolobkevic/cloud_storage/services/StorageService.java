@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.kolobkevic.cloud_storage.dtos.BreadCrumbDto;
 import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
+import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
 import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
@@ -30,7 +31,7 @@ public class StorageService {
     }
 
     public List<StorageObject> getListOfObjects(String username, String objectName, boolean isRecursive)
-            throws StorageServerException {
+            throws StorageServerException, StorageObjectNotFoundException {
         var objName = getUserFolderName(username) + objectName;
         var allObjects = storageDAO.getListOfObjects(objName, isRecursive);
         List<StorageObject> objects = new ArrayList<>();
@@ -87,7 +88,7 @@ public class StorageService {
     }
 
     public void renameObject(String username, String oldName, String newName)
-            throws ObjectAlreadyExistsException, StorageServerException {
+            throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
         if (oldName.endsWith("/")) {
             newName = getNewPath(oldName, newName);
             checkFileName(username, newName);
@@ -101,7 +102,7 @@ public class StorageService {
     }
 
     private void checkFileName(String username, String filename)
-            throws ObjectAlreadyExistsException, StorageServerException {
+            throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
         var objects = getListOfObjects(username, filename, false);
         if (!objects.isEmpty()) {
             throw new ObjectAlreadyExistsException(filename);
@@ -135,7 +136,7 @@ public class StorageService {
         return path.replace(getFileNameFromPath(path), newName);
     }
 
-    private void renameFolder(String username, String oldName, String newName) throws StorageServerException {
+    private void renameFolder(String username, String oldName, String newName) throws StorageServerException, StorageObjectNotFoundException {
         var objects = getListOfObjects(username, oldName, true);
         for (var obj : objects) {
             var newPath = obj.getPath().replace(oldName, newName);
@@ -150,7 +151,7 @@ public class StorageService {
         return String.join("/", splitted) + "/";
     }
 
-    public List<StorageObject> search(String username, String query) throws StorageServerException {
+    public List<StorageObject> search(String username, String query) throws StorageServerException, StorageObjectNotFoundException {
         var objects = getListOfObjects(username, "", true);
         return objects.stream()
                 .filter(obj -> obj.getObjectName().toLowerCase().contains(query.toLowerCase()))
