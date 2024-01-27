@@ -98,7 +98,9 @@ public class StorageController {
     }
 
     @PostMapping("/storage/create")
-    public String createFolder(@ModelAttribute("fileRequest") FolderRenameDto folderRenameDto) throws StorageServerException {
+    public String createFolder(@ModelAttribute("fileRequest") FolderRenameDto folderRenameDto)
+            throws StorageServerException {
+
         storageService.createFolder(folderRenameDto.getUsername(),
                 folderRenameDto.getPath() + folderRenameDto.getNewPath());
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(folderRenameDto.getPath());

@@ -68,16 +68,6 @@ public class StorageService {
         }
     }
 
-    public void uploadFolder(String username, MultipartFile[] files, String folderPath) throws StorageServerException {
-        for (var file : files) {
-            try (var stream = file.getInputStream()) {
-                uploadObject(getUserFolderName(username) + folderPath, stream);
-            } catch (Exception e) {
-                throw new StorageServerException(e.getMessage());
-            }
-        }
-    }
-
     public void createFolder(String username, String folderName) throws StorageServerException {
         folderName = folderName.endsWith("/") ? folderName : (folderName + "/");
         storageDAO.createFolder(getUserFolderName(username) + folderName);
@@ -90,20 +80,20 @@ public class StorageService {
     public void renameObject(String username, String oldName, String newName)
             throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
         if (oldName.endsWith("/")) {
-            newName = getNewPath(oldName, newName);
-            checkFileName(username, newName);
-            createFolder(username, newName);
             renameFolder(username, oldName, newName);
         } else {
-            newName = getFileName(oldName, newName);
-            checkFileName(username, newName);
-            storageDAO.renameObject(getUserFolderName(username) + oldName, getUserFolderName(username) + newName);
+            renameFile(username, oldName, newName);
         }
     }
 
     private void checkFileName(String username, String filename)
-            throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
-        var objects = getListOfObjects(username, filename, false);
+            throws ObjectAlreadyExistsException, StorageServerException {
+        List<StorageObject> objects;
+        try {
+            objects = getListOfObjects(username, filename, false);
+        } catch (StorageObjectNotFoundException e) {
+            return;
+        }
         if (!objects.isEmpty()) {
             throw new ObjectAlreadyExistsException(filename);
         }
@@ -136,13 +126,29 @@ public class StorageService {
         return path.replace(getFileNameFromPath(path), newName);
     }
 
-    private void renameFolder(String username, String oldName, String newName) throws StorageServerException, StorageObjectNotFoundException {
+    private void renameFolder(String username, String oldName, String newName) throws StorageServerException,
+            StorageObjectNotFoundException, ObjectAlreadyExistsException {
+
+        var fullNewName = getNewPath(oldName, newName);
+        checkFileName(username, fullNewName);
+        createFolder(username, fullNewName);
+
         var objects = getListOfObjects(username, oldName, true);
         for (var obj : objects) {
-            var newPath = obj.getPath().replace(oldName, newName);
-            storageDAO.renameObject(getUserFolderName(username) + obj.getPath(), getUserFolderName(username) + newPath);
+            var newPath = obj.getPath().replace(oldName, fullNewName);
+            storageDAO.renameObject(getUserFolderName(username) + obj.getPath(),
+                    getUserFolderName(username) + newPath);
         }
         storageDAO.removeObject(getUserFolderName(username) + oldName);
+    }
+
+    private void renameFile(String username, String oldName, String newName) throws StorageServerException,
+            ObjectAlreadyExistsException {
+
+        var fullNewName = getFileName(oldName, newName);
+        checkFileName(username, fullNewName);
+        storageDAO.renameObject(getUserFolderName(username) + oldName,
+                getUserFolderName(username) + fullNewName);
     }
 
     private String getNewPath(String path, String newPath) {
@@ -151,7 +157,8 @@ public class StorageService {
         return String.join("/", splitted) + "/";
     }
 
-    public List<StorageObject> search(String username, String query) throws StorageServerException, StorageObjectNotFoundException {
+    public List<StorageObject> search(String username, String query) throws
+            StorageServerException, StorageObjectNotFoundException {
         var objects = getListOfObjects(username, "", true);
         return objects.stream()
                 .filter(obj -> obj.getObjectName().toLowerCase().contains(query.toLowerCase()))
@@ -159,7 +166,9 @@ public class StorageService {
     }
 
     public String getParentPath(String path) {
-        path = path.substring(0, path.lastIndexOf('/'));
+        if (path.endsWith("/")) {
+            path = path.substring(0, path.lastIndexOf('/'));
+        }
         return path.substring(0, path.lastIndexOf('/') + 1);
     }
 }
