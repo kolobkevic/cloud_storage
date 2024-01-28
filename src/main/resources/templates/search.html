@@ -11,7 +11,6 @@
         <a th:href="@{/storage}" class="btn btn-primary">На главную</a>
     </div>
 </div>
-<!--<h2 th:if="${searchResults.isEmpty()}" class="container">Nothing was found</h2>-->
 
 <div th:unless="${searchResults.isEmpty()}" class="container">
     <h2>Search results</h2>

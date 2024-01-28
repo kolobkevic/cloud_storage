@@ -13,18 +13,18 @@ public class GlobalControllerAdvice {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(ObjectAlreadyExistsException.class)
     public String objectAlreadyExistsException() {
-        return "error409";
+        return "/errors/error409";
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(StorageServerException.class)
     public String storageServerException() {
-        return "error500";
+        return "/errors/error500";
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(StorageObjectNotFoundException.class)
     public String storageObjectNotFoundException() {
-        return "error404";
+        return "/errors/error404";
     }
 }

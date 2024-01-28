@@ -99,7 +99,7 @@ public class StorageController {
 
     @PostMapping("/storage/create")
     public String createFolder(@ModelAttribute("fileRequest") FolderRenameDto folderRenameDto)
-            throws StorageServerException {
+            throws StorageServerException, ObjectAlreadyExistsException {
 
         storageService.createFolder(folderRenameDto.getUsername(),
                 folderRenameDto.getPath() + folderRenameDto.getNewPath());

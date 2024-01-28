@@ -68,8 +68,10 @@ public class StorageService {
         }
     }
 
-    public void createFolder(String username, String folderName) throws StorageServerException {
+    public void createFolder(String username, String folderName) throws StorageServerException,
+            ObjectAlreadyExistsException {
         folderName = folderName.endsWith("/") ? folderName : (folderName + "/");
+        checkFileName(username, folderName);
         storageDAO.createFolder(getUserFolderName(username) + folderName);
     }
 
