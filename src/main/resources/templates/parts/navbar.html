@@ -1,7 +1,7 @@
 <div class="container header" th:fragment="nav">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/storage">Cloud storage</a>
+            <a class="navbar-brand" href="/storage">Облачное хранилище</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -9,7 +9,8 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item" th:if="${username}" >
-                        <a class="nav-link disabled" aria-disabled="true">Welcome, <span th:text="${username}"></span>
+                        <a class="nav-link disabled" aria-disabled="true">
+                            Здравствуй, <span th:text="${username}"></span>
                         </a>
                     </li>
                     <li class="nav-item" th:if="${username}">
@@ -21,7 +22,7 @@
             <form th:action="@{/search}" th:method="GET" id="from__search" th:if="${username}">
                 <div class="input-group">
                     <input type="text" name="query" class="form-control" placeholder="Поиск файлов"
-                           aria-label="Recipient's username" aria-describedby="button-addon2">
+                           aria-label="Username" aria-describedby="button-addon2">
                     <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Найти</button>
                 </div>
             </form>

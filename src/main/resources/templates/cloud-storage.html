@@ -12,7 +12,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a th:class="${breadCrumbsList == null ? 'breadcrumb-item active' : ''}"
-                   th:href="@{/storage}">Storage</a>
+                   th:href="@{/storage}">Хранилище</a>
             </li>
             <li class="breadcrumb-item" th:each="breadCrumb, iterStat : ${breadCrumbsList}">
                 <a th:class="${iterStat.last ? 'breadcrumb-item active' : 'breadcrumb-item'}"
@@ -24,13 +24,13 @@
 
     <div class="col-auto mt-5">
         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#fileUploadModal">
-            Upload file
+            Загрузить файл
         </button>
         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#folderUploadModal">
-            Upload folder
+            Загрузить папку
         </button>
         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
-            Create folder
+            Создать папку
         </button>
 
         <!-- File Create and Upload Modal -->
@@ -40,7 +40,7 @@
     </div>
 
     <div th:if="${files}">
-        <h6 class="mb-3">Folders</h6>
+        <h6 class="mb-3">Папки</h6>
         <div class="row row-cols-1 row-cols-md-5 g-4">
             <div class="col" th:each="file, fileStat : ${files}" th:if="${file.isDir}">
                 <div class="card flex-row p-2 align-items-center justify-content-between shadow-4-strong">
@@ -68,7 +68,7 @@
                                     <button class="dropdown-item" data-bs-toggle="modal"
                                             data-bs-target="#rename"
                                             th:attr="data-bs-target=|#rename-${fileStat.index}|">
-                                        Rename
+                                        Переименовать
                                     </button>
                                 </li>
 
@@ -79,7 +79,7 @@
                                         <input th:name="path" th:value="${file.path}" type="hidden">
                                         <input th:name="username" th:value="${username}" type="hidden">
                                         <input th:name="objectName" th:value="${file.objectName}" type="hidden">
-                                        <button class="dropdown-item" type="submit">Delete</button>
+                                        <button class="dropdown-item" type="submit">Удалить</button>
                                     </form>
                                 </li>
                             </ul>
@@ -96,7 +96,7 @@
 
     <!-- Files -->
     <div class="mt-5" th:if="${files}">
-        <h6 class="mb-3">Files</h6>
+        <h6 class="mb-3">Файлы</h6>
         <div class="row row-cols-1 row-cols-md-5 g-4">
             <div class="col" th:each="file, fileStat : ${files}" th:unless="${file.isDir}">
                 <div class="card flex-row p-2 align-items-center justify-content-between shadow-4-strong">
@@ -125,7 +125,7 @@
                                         <input th:name="path" th:value="${file.path}" type="hidden">
                                         <input th:name="username" th:value="${username}" type="hidden">
                                         <input th:name="objectName" th:value="${file.objectName}" type="hidden">
-                                        <button class="dropdown-item" type="submit">Download</button>
+                                        <button class="dropdown-item" type="submit">Скачать</button>
                                     </form>
                                 </li>
 
@@ -134,7 +134,7 @@
                                     <button class="dropdown-item" data-bs-toggle="modal"
                                             data-bs-target="#rename"
                                             th:attr="data-bs-target=|#rename-${fileStat.index}|">
-                                        Rename
+                                        Переименовать
                                     </button>
                                 </li>
 
@@ -145,7 +145,7 @@
                                         <input th:name="path" th:value="${file.path}" type="hidden">
                                         <input th:name="username" th:value="${username}" type="hidden">
                                         <input th:name="objectName" th:value="${file.objectName}" type="hidden">
-                                        <button class="dropdown-item" type="submit">Delete</button>
+                                        <button class="dropdown-item" type="submit">Удалить</button>
                                     </form>
                                 </li>
                             </ul>

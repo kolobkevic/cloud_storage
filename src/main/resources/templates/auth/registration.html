@@ -8,13 +8,13 @@
 
     <div class="form-floating">
         <input type="text" class="form-control" id="firstName" placeholder="First name" name="firstName">
-        <div th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" style="color:red">First name error</div>
+        <div th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" style="color:red">Имя содержит ошибки</div>
         <label for="firstName">Имя</label>
     </div>
 
     <div class="form-floating">
         <input type="text" class="form-control" id="lastName" placeholder="Last name" name="lastName">
-        <div th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" style="color: red">Last name error</div>
+        <div th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" style="color: red">Фамилия содержит ошибки</div>
         <label for="lastName">Фамилия</label>
     </div>
 
@@ -26,11 +26,11 @@
 
     <div class="form-floating">
         <input type="password" class="form-control" id="password" placeholder="Password" name="password">
-        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color: red">Password error</div>
+        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color: red">Пароль содержит ошибки</div>
         <label for="password">Пароль (6-20 символов)</label>
     </div>
 
-    <button class="w-100 btn btn-lg btn-primary" type="submit">Register</button>
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Зарегистрироваться</button>
 
 </form>
 </body>

@@ -13,7 +13,7 @@
 </div>
 
 <div th:unless="${searchResults.isEmpty()}" class="container">
-    <h2>Search results</h2>
+    <h2>Результаты поиска</h2>
     <hr class="mt-1">
 
     <div class="col-auto mt-5">
@@ -22,7 +22,7 @@
 
     <!-- Folders -->
     <div th:if="${searchResults}">
-        <h6 class="mb-3">Folders</h6>
+        <h6 class="mb-3">Папки</h6>
         <div class="row row-cols-1 row-cols-md-5 g-4">
             <div class="col" th:each="file, fileStat : ${searchResults}" th:if="${file.isDir}">
                 <div class="card flex-row p-2 align-items-center justify-content-between shadow-4-strong">
@@ -40,7 +40,7 @@
 
     <!-- Files -->
     <div class="mt-5" th:if="${searchResults}">
-        <h6 class="mb-3">Files</h6>
+        <h6 class="mb-3">Файлы</h6>
         <div class="row row-cols-1 row-cols-md-5 g-4">
             <div class="col" th:each="file, fileStat : ${searchResults}" th:unless="${file.isDir}">
                 <div class="card flex-row p-2 align-items-center justify-content-between shadow-4-strong">
@@ -69,7 +69,7 @@
                                         <input th:name="path" th:value="${file.path}" type="hidden">
                                         <input th:name="username" th:value="${username}" type="hidden">
                                         <input th:name="objectName" th:value="${file.objectName}" type="hidden">
-                                        <button class="dropdown-item" type="submit">Download</button>
+                                        <button class="dropdown-item" type="submit">Скачать</button>
                                     </form>
                                 </li>
 
@@ -78,7 +78,7 @@
                                     <button class="dropdown-item" data-bs-toggle="modal"
                                             data-bs-target="#rename"
                                             th:attr="data-bs-target=|#rename-${fileStat.index}|">
-                                        Rename
+                                        Переименовать
                                     </button>
                                 </li>
 
@@ -89,7 +89,7 @@
                                         <input th:name="path" th:value="${file.path}" type="hidden">
                                         <input th:name="username" th:value="${username}" type="hidden">
                                         <input th:name="objectName" th:value="${file.objectName}" type="hidden">
-                                        <button class="dropdown-item" type="submit">Delete</button>
+                                        <button class="dropdown-item" type="submit">Удалить</button>
                                     </form>
                                 </li>
                             </ul>
