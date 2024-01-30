@@ -123,7 +123,7 @@ public class StorageService {
         return path.substring(path.lastIndexOf("/") + 1);
     }
 
-    private String getFileName(String path, String newName) {
+    private String renameFileName(String path, String newName) {
         return path.replace(getFileNameFromPath(path), newName);
     }
 
@@ -148,7 +148,7 @@ public class StorageService {
     private void renameFile(String username, String oldName, String newName) throws StorageServerException,
             ObjectAlreadyExistsException {
 
-        var fullNewName = getFileName(oldName, newName);
+        var fullNewName = renameFileName(oldName, newName);
         if (isObjectExists(username, fullNewName)){
             throw new ObjectAlreadyExistsException("Объект с таким именем уже существует");
         }
