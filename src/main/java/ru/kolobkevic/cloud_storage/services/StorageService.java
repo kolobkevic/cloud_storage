@@ -60,9 +60,7 @@ public class StorageService {
         for (var file : files) {
             try (var stream = file.getInputStream()) {
                 var objName = path + file.getOriginalFilename();
-                checkFileName(username, objName);
                 uploadObject(getUserFolderName(username) + objName, stream);
-            } catch (ObjectAlreadyExistsException ignored) {
             } catch (Exception e) {
                 throw new StorageServerException(e.getMessage());
             }
@@ -72,7 +70,9 @@ public class StorageService {
     public void createFolder(String username, String folderName) throws StorageServerException,
             ObjectAlreadyExistsException {
         folderName = folderName.endsWith("/") ? folderName : (folderName + "/");
-        checkFileName(username, folderName);
+        if (isObjectExists(username, folderName)) {
+            throw new ObjectAlreadyExistsException("Объект с именем " + folderName + " уже существует");
+        }
         storageDAO.createFolder(getUserFolderName(username) + folderName);
     }
 
@@ -89,17 +89,15 @@ public class StorageService {
         }
     }
 
-    private void checkFileName(String username, String filename)
-            throws ObjectAlreadyExistsException, StorageServerException {
+    private boolean isObjectExists(String username, String filename)
+            throws StorageServerException {
         List<StorageObject> objects;
         try {
             objects = getListOfObjects(username, filename, false);
         } catch (StorageObjectNotFoundException e) {
-            return;
+            return false;
         }
-        if (!objects.isEmpty()) {
-            throw new ObjectAlreadyExistsException(filename);
-        }
+        return !objects.isEmpty();
     }
 
     public ByteArrayResource downloadFile(String username, String objectName) throws StorageServerException {
@@ -133,7 +131,9 @@ public class StorageService {
             StorageObjectNotFoundException, ObjectAlreadyExistsException {
 
         var fullNewName = getNewPath(oldName, newName);
-        checkFileName(username, fullNewName);
+        if (isObjectExists(username, fullNewName)){
+            throw new ObjectAlreadyExistsException("Объект с таким именем уже существует");
+        }
         createFolder(username, fullNewName);
 
         var objects = getListOfObjects(username, oldName, true);
@@ -149,7 +149,9 @@ public class StorageService {
             ObjectAlreadyExistsException {
 
         var fullNewName = getFileName(oldName, newName);
-        checkFileName(username, fullNewName);
+        if (isObjectExists(username, fullNewName)){
+            throw new ObjectAlreadyExistsException("Объект с таким именем уже существует");
+        }
         storageDAO.renameObject(getUserFolderName(username) + oldName,
                 getUserFolderName(username) + fullNewName);
     }
