@@ -12,7 +12,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a th:class="${breadCrumbsList == null ? 'breadcrumb-item active' : ''}"
-                   th:href="@{/storage}">Хранилище</a>
+                   th:href="@{/storage}">Моё хранилище</a>
             </li>
             <li class="breadcrumb-item" th:each="breadCrumb, iterStat : ${breadCrumbsList}">
                 <a th:class="${iterStat.last ? 'breadcrumb-item active' : 'breadcrumb-item'}"
@@ -160,6 +160,7 @@
         </div>
     </div>
 </div>
+<p></p>
 <div th:replace="~{parts/footer :: footer}"></div>
 </body>
 </html>

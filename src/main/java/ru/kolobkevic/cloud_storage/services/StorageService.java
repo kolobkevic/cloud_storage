@@ -62,6 +62,7 @@ public class StorageService {
                 var objName = path + file.getOriginalFilename();
                 checkFileName(username, objName);
                 uploadObject(getUserFolderName(username) + objName, stream);
+            } catch (ObjectAlreadyExistsException ignored) {
             } catch (Exception e) {
                 throw new StorageServerException(e.getMessage());
             }
