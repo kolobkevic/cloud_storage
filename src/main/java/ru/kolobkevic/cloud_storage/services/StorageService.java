@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.kolobkevic.cloud_storage.dtos.BreadCrumbDto;
 import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
+import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
 import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
@@ -30,12 +31,17 @@ public class StorageService {
     }
 
     public List<StorageObject> getListOfObjects(String username, String objectName, boolean isRecursive)
-            throws StorageServerException {
+            throws StorageServerException, StorageObjectNotFoundException {
         var objName = getUserFolderName(username) + objectName;
         var allObjects = storageDAO.getListOfObjects(objName, isRecursive);
         List<StorageObject> objects = new ArrayList<>();
         for (var obj : allObjects) {
-            if (!obj.getPath().equals(objName) && !obj.getPath().equals(getUserFolderName(username))) {
+            if (obj.isDir()) {
+                if (!obj.getPath().equals(objName) && !obj.getPath().equals(getUserFolderName(username))) {
+                    obj.setPath(getPathWithoutUsername(obj.getPath()));
+                    objects.add(obj);
+                }
+            } else {
                 obj.setPath(getPathWithoutUsername(obj.getPath()));
                 objects.add(obj);
             }
@@ -54,52 +60,48 @@ public class StorageService {
         for (var file : files) {
             try (var stream = file.getInputStream()) {
                 var objName = path + file.getOriginalFilename();
-                checkFileName(username, objName);
-                uploadObject(objName, stream);
+                uploadObject(getUserFolderName(username) + objName, stream);
             } catch (Exception e) {
                 throw new StorageServerException(e.getMessage());
             }
         }
     }
 
-    public void uploadFolder(String username, MultipartFile[] files, String folderPath) throws StorageServerException {
-        for (var file : files) {
-            try (var stream = file.getInputStream()) {
-                uploadObject(getUserFolderName(username) + folderPath, stream);
-            } catch (Exception e) {
-                throw new StorageServerException(e.getMessage());
-            }
+    public void createFolder(String username, String folderName) throws StorageServerException,
+            ObjectAlreadyExistsException {
+        folderName = folderName.endsWith("/") ? folderName : (folderName + "/");
+        if (isObjectExists(username, folderName)) {
+            throw new ObjectAlreadyExistsException("Объект с именем " + folderName + " уже существует");
         }
-    }
-
-    public void createFolder(String username, String folderName) throws StorageServerException {
         storageDAO.createFolder(getUserFolderName(username) + folderName);
     }
 
     public void removeObject(String username, String filePath) throws StorageServerException {
-        storageDAO.removeObject(getUserFolderName(username) + getPathWithoutUsername(filePath));
+        storageDAO.removeObject(getUserFolderName(username) + filePath);
     }
 
     public void renameObject(String username, String oldName, String newName)
-            throws ObjectAlreadyExistsException, StorageServerException {
+            throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
         if (oldName.endsWith("/")) {
             renameFolder(username, oldName, newName);
         } else {
-            checkFileName(username, newName);
-            storageDAO.renameObject(oldName, getFileName(oldName, newName));
+            renameFile(username, oldName, newName);
         }
     }
 
-    private void checkFileName(String username, String filename)
-            throws ObjectAlreadyExistsException, StorageServerException {
-        var objects = getListOfObjects(username, filename, false);
-        if (objects.isEmpty()) {
-            throw new ObjectAlreadyExistsException(filename);
+    private boolean isObjectExists(String username, String filename)
+            throws StorageServerException {
+        List<StorageObject> objects;
+        try {
+            objects = getListOfObjects(username, filename, false);
+        } catch (StorageObjectNotFoundException e) {
+            return false;
         }
+        return !objects.isEmpty();
     }
 
     public ByteArrayResource downloadFile(String username, String objectName) throws StorageServerException {
-        return storageDAO.downloadObject(getUserFolderName(username) + getPathWithoutUsername(objectName));
+        return storageDAO.downloadObject(getUserFolderName(username) + objectName);
     }
 
     public List<BreadCrumbDto> getBreadCrumb(String path) {
@@ -121,21 +123,57 @@ public class StorageService {
         return path.substring(path.lastIndexOf("/") + 1);
     }
 
-    private String getFileName(String path, String newName) {
+    private String renameFileName(String path, String newName) {
         return path.replace(getFileNameFromPath(path), newName);
     }
 
-    private void renameFolder(String username, String oldName, String newName) throws StorageServerException {
+    private void renameFolder(String username, String oldName, String newName) throws StorageServerException,
+            StorageObjectNotFoundException, ObjectAlreadyExistsException {
+
+        var fullNewName = getNewPath(oldName, newName);
+        if (isObjectExists(username, fullNewName)){
+            throw new ObjectAlreadyExistsException("Объект с таким именем уже существует");
+        }
+        createFolder(username, fullNewName);
+
         var objects = getListOfObjects(username, oldName, true);
         for (var obj : objects) {
-            var newPath = obj.getPath().replace(oldName, getNewPath(oldName, newName));
-            storageDAO.renameObject(obj.getPath(), newPath);
+            var newPath = obj.getPath().replace(oldName, fullNewName);
+            storageDAO.renameObject(getUserFolderName(username) + obj.getPath(),
+                    getUserFolderName(username) + newPath);
         }
+        storageDAO.removeObject(getUserFolderName(username) + oldName);
+    }
+
+    private void renameFile(String username, String oldName, String newName) throws StorageServerException,
+            ObjectAlreadyExistsException {
+
+        var fullNewName = renameFileName(oldName, newName);
+        if (isObjectExists(username, fullNewName)){
+            throw new ObjectAlreadyExistsException("Объект с таким именем уже существует");
+        }
+        storageDAO.renameObject(getUserFolderName(username) + oldName,
+                getUserFolderName(username) + fullNewName);
     }
 
     private String getNewPath(String path, String newPath) {
         var splitted = path.split("/");
         splitted[splitted.length - 1] = newPath;
         return String.join("/", splitted) + "/";
+    }
+
+    public List<StorageObject> search(String username, String query) throws
+            StorageServerException, StorageObjectNotFoundException {
+        var objects = getListOfObjects(username, "", true);
+        return objects.stream()
+                .filter(obj -> obj.getObjectName().toLowerCase().contains(query.toLowerCase()))
+                .toList();
+    }
+
+    public String getParentPath(String path) {
+        if (path.endsWith("/")) {
+            path = path.substring(0, path.lastIndexOf('/'));
+        }
+        return path.substring(0, path.lastIndexOf('/') + 1);
     }
 }

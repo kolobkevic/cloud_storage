@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="EN">
+<head th:replace="~{parts/header :: header}">
+</head>
+<body>
+<div th:replace="~{parts/navbar :: nav}"></div>
+
+<div class="container">
+    <h2 class="mb-3">Файл или папка с таким именем не найдены.</h2>
+    <div class="col-auto mt-5">
+        <a th:href="@{/storage}" class="btn btn-primary">На главную</a>
+    </div>
+</div>
+
+</body>
+</html>
