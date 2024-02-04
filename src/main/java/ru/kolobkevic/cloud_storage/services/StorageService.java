@@ -11,11 +11,7 @@ import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
 import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -49,10 +45,6 @@ public class StorageService {
         return objects;
     }
 
-    private void uploadObject(String filePath, InputStream in) throws StorageServerException {
-        storageDAO.uploadObject(filePath, in);
-    }
-
     public void uploadFile(String username, List<MultipartFile> files, String path) throws StorageServerException {
         if (path.isEmpty()) {
             path = getUserFolderName(username);
@@ -60,14 +52,43 @@ public class StorageService {
         for (var file : files) {
             try (var stream = file.getInputStream()) {
                 var objName = path + file.getOriginalFilename();
-                uploadObject(getUserFolderName(username) + objName, stream);
+                storageDAO.uploadObject(getUserFolderName(username) + objName, stream);
             } catch (Exception e) {
                 throw new StorageServerException(e.getMessage());
             }
         }
     }
 
-    public void createFolder(String username, String folderName) throws StorageServerException,
+    public void uploadFolder(String username, List<MultipartFile> files, String path)
+            throws StorageServerException {
+        for (var file : files) {
+            createFolderList(username, getParentPath(file.getOriginalFilename()));
+            try (var stream = file.getInputStream()) {
+                var objName = path + file.getOriginalFilename();
+                storageDAO.uploadObject(getUserFolderName(username) + objName, stream);
+            } catch (Exception e) {
+                throw new StorageServerException(e.getMessage());
+            }
+        }
+    }
+
+    public void createFolderList(String username, String folderName) throws StorageServerException {
+        if (!folderName.endsWith("/")) {
+            folderName = folderName + "/";
+        }
+        var folderNames = folderName.split("/");
+        StringBuilder name = new StringBuilder();
+        for (var objectName : folderNames) {
+            try {
+                name.append(objectName).append("/");
+                createFolder(username, name.toString());
+            } catch (ObjectAlreadyExistsException ignore){
+                
+            }
+        }
+    }
+
+    private void createFolder(String username, String folderName) throws StorageServerException,
             ObjectAlreadyExistsException {
         folderName = folderName.endsWith("/") ? folderName : (folderName + "/");
         if (isObjectExists(username, folderName)) {
@@ -131,7 +152,7 @@ public class StorageService {
             StorageObjectNotFoundException, ObjectAlreadyExistsException {
 
         var fullNewName = getNewPath(oldName, newName);
-        if (isObjectExists(username, fullNewName)){
+        if (isObjectExists(username, fullNewName)) {
             throw new ObjectAlreadyExistsException("Объект с таким именем уже существует");
         }
         createFolder(username, fullNewName);
@@ -149,7 +170,7 @@ public class StorageService {
             ObjectAlreadyExistsException {
 
         var fullNewName = renameFileName(oldName, newName);
-        if (isObjectExists(username, fullNewName)){
+        if (isObjectExists(username, fullNewName)) {
             throw new ObjectAlreadyExistsException("Объект с таким именем уже существует");
         }
         storageDAO.renameObject(getUserFolderName(username) + oldName,

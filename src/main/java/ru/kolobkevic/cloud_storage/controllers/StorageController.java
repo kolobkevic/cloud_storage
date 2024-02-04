@@ -52,7 +52,12 @@ public class StorageController {
     public String uploadFile(@ModelAttribute("filesDto") FilesDto filesDto) throws StorageServerException {
         storageService.uploadFile(filesDto.getUsername(), filesDto.getFiles(), filesDto.getPath());
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(filesDto.getPath());
+    }
 
+    @PostMapping("/storage/uploadFolder")
+    public String uploadFolder(@ModelAttribute("filesDto") FilesDto filesDto) throws StorageServerException {
+        storageService.uploadFolder(filesDto.getUsername(), filesDto.getFiles(), filesDto.getPath());
+        return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(filesDto.getPath());
     }
 
     @PutMapping("/storage")
@@ -99,9 +104,9 @@ public class StorageController {
 
     @PostMapping("/storage/create")
     public String createFolder(@ModelAttribute("fileRequest") FolderRenameDto folderRenameDto)
-            throws StorageServerException, ObjectAlreadyExistsException {
+            throws StorageServerException {
 
-        storageService.createFolder(folderRenameDto.getUsername(),
+        storageService.createFolderList(folderRenameDto.getUsername(),
                 folderRenameDto.getPath() + folderRenameDto.getNewPath());
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(folderRenameDto.getPath());
     }
