@@ -11,7 +11,10 @@ import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
 import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,9 +49,6 @@ public class StorageService {
     }
 
     public void uploadFile(String username, List<MultipartFile> files, String path) throws StorageServerException {
-        if (path.isEmpty()) {
-            path = getUserFolderName(username);
-        }
         for (var file : files) {
             try (var stream = file.getInputStream()) {
                 var objName = path + file.getOriginalFilename();
@@ -82,8 +82,8 @@ public class StorageService {
             try {
                 name.append(objectName).append("/");
                 createFolder(username, name.toString());
-            } catch (ObjectAlreadyExistsException ignore){
-                
+            } catch (ObjectAlreadyExistsException ignore) {
+
             }
         }
     }
@@ -180,7 +180,11 @@ public class StorageService {
     private String getNewPath(String path, String newPath) {
         var splitted = path.split("/");
         splitted[splitted.length - 1] = newPath;
-        return String.join("/", splitted) + "/";
+        if (newPath.endsWith("/")) {
+            return String.join("/", splitted);
+        } else {
+            return String.join("/", splitted) + "/";
+        }
     }
 
     public List<StorageObject> search(String username, String query) throws
