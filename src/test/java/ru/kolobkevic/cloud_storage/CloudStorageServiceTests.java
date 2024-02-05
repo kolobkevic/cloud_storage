@@ -45,6 +45,8 @@ class CloudStorageServiceTests {
 
     @Test
     void folderFoundWhenCreated() throws StorageServerException, StorageObjectNotFoundException {
+        storageService.createUserFolder(username);
+
         storageService.createFolderList(username, "folder");
         Assertions.assertEquals(1, storageService.search(username, "folder").size());
 
@@ -59,7 +61,9 @@ class CloudStorageServiceTests {
     }
 
     @Test
-    void objectsFoundWhenCreated() throws StorageServerException, StorageObjectNotFoundException, ObjectAlreadyExistsException {
+    void objectsFoundWhenCreated() throws StorageServerException, StorageObjectNotFoundException {
+        storageService.createUserFolder(username);
+
         storageService.createFolderList(username, "apple/lemon");
 
         Assertions.assertEquals(1,
@@ -71,6 +75,8 @@ class CloudStorageServiceTests {
 
     @Test
     void uploadFile() throws StorageServerException, StorageObjectNotFoundException {
+        storageService.createUserFolder(username);
+
         storageService.createFolderList(username, "apple/lemon/");
         storageService.uploadFile(username, List.of(mockFileWithName("123.txt")), "apple/lemon/");
         Assertions.assertEquals(1, storageService.search(username, "123.txt").size());
@@ -80,6 +86,8 @@ class CloudStorageServiceTests {
 
     @Test
     void uploadFolder() throws StorageServerException, StorageObjectNotFoundException {
+        storageService.createUserFolder(username);
+
         storageService.uploadFolder(username,
                 List.of(mockFileWithName("apple/123.txt"),
                         mockFileWithName("apple/lemon/333.jpg")),
@@ -90,19 +98,32 @@ class CloudStorageServiceTests {
     }
 
     @Test
-    void removeObject() {
+    void removeObject() throws StorageServerException, StorageObjectNotFoundException {
+        storageService.createUserFolder(username);
+        storageService.uploadFolder(username, List.of(mockFileWithName("apple/123.txt")), "");
+        storageService.removeObject(username, "apple/");
+        Assertions.assertEquals(0, storageService.search(username, "123").size());
+        Assertions.assertEquals(0, storageService.search(username, "apple").size());
     }
 
     @Test
-    void renameObject() {
-    }
+    void renameObject() throws StorageServerException, StorageObjectNotFoundException, ObjectAlreadyExistsException {
+        storageService.createUserFolder(username);
 
-    @Test
-    void downloadFile() {
-    }
+        storageService.uploadFolder(username, List.of(mockFileWithName("apple/123.txt")), "");
+        storageService.uploadFolder(username, List.of(mockFileWithName("456.txt")), "");
+        storageService.renameObject(username, "apple/123.txt", "apple/333.txt");
+        storageService.renameObject(username, "456.txt", "007.txt");
+        Assertions.assertEquals(1, storageService.search(username, "333.txt").size());
+        Assertions.assertEquals(1, storageService.search(username, "007.txt").size());
 
-    @Test
-    void getBreadCrumb() {
+        storageService.renameObject(username, "apple/", "lemon/");
+        Assertions.assertEquals(0, storageService.search(username, "apple").size());
+        Assertions.assertEquals(0, storageService.search(username, "123").size());
+        Assertions.assertEquals(0, storageService.search(username, "456").size());
+        Assertions.assertEquals(1, storageService.search(username, "lemon").size());
+        Assertions.assertEquals(2,
+                storageService.getListOfObjects(username, "lemon", true).size());
     }
 
     private static MockMultipartFile mockFileWithName(String name) {
