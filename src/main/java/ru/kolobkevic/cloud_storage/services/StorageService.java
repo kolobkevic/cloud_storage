@@ -62,7 +62,11 @@ public class StorageService {
     public void uploadFolder(String username, List<MultipartFile> files, String path)
             throws StorageServerException {
         for (var file : files) {
-            createFolderList(username, getParentPath(file.getOriginalFilename()));
+            var fileName = file.getOriginalFilename();
+            if (fileName == null) {
+                fileName = "";
+            }
+            createFolderList(username, getParentPath(fileName));
             try (var stream = file.getInputStream()) {
                 var objName = path + file.getOriginalFilename();
                 storageDAO.uploadObject(getUserFolderName(username) + objName, stream);
