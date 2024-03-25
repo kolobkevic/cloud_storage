@@ -3,8 +3,10 @@ package ru.kolobkevic.cloud_storage.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import ru.kolobkevic.cloud_storage.dtos.BreadCrumbDto;
+import ru.kolobkevic.cloud_storage.dtos.FileDto;
+import ru.kolobkevic.cloud_storage.dtos.FileRenameDto;
+import ru.kolobkevic.cloud_storage.dtos.FilesUploadDto;
 import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
@@ -48,7 +50,10 @@ public class StorageService {
         return objects;
     }
 
-    public void uploadFile(String username, List<MultipartFile> files, String path) throws StorageServerException {
+    public void uploadFile(FilesUploadDto filesUploadDto) throws StorageServerException {
+        var username = filesUploadDto.getUsername();
+        var files = filesUploadDto.getFiles();
+        var path = filesUploadDto.getPath();
         for (var file : files) {
             try (var stream = file.getInputStream()) {
                 var objName = path + file.getOriginalFilename();
@@ -59,8 +64,12 @@ public class StorageService {
         }
     }
 
-    public void uploadFolder(String username, List<MultipartFile> files, String path)
+    public void uploadFolder(FilesUploadDto filesUploadDto)
             throws StorageServerException, ObjectAlreadyExistsException {
+        var username = filesUploadDto.getUsername();
+        var files = filesUploadDto.getFiles();
+        var path = filesUploadDto.getPath();
+
         for (var file : files) {
             var fileName = file.getOriginalFilename();
             if (fileName == null) {
@@ -100,12 +109,16 @@ public class StorageService {
         storageDAO.createFolder(getUserFolderName(username) + folderName);
     }
 
-    public void removeObject(String username, String filePath) throws StorageServerException {
-        storageDAO.removeObject(getUserFolderName(username) + filePath);
+    public void removeObject(FileDto fileDto) throws StorageServerException {
+        storageDAO.removeObject(getUserFolderName(fileDto.getUsername()) + fileDto.getPath());
     }
 
-    public void renameObject(String username, String oldName, String newName)
+    public void renameObject(FileRenameDto fileRenameDto)
             throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
+        var username = fileRenameDto.getUsername();
+        var oldName = fileRenameDto.getPath();
+        var newName = fileRenameDto.getNewPath();
+
         if (oldName.endsWith("/")) {
             renameFolder(username, oldName, newName);
         } else {
@@ -124,8 +137,8 @@ public class StorageService {
         return !objects.isEmpty();
     }
 
-    public ByteArrayResource downloadFile(String username, String objectName) throws StorageServerException {
-        return storageDAO.downloadObject(getUserFolderName(username) + objectName);
+    public ByteArrayResource downloadFile(FileDto fileDto) throws StorageServerException {
+        return storageDAO.downloadObject(getUserFolderName(fileDto.getUsername()) + fileDto.getPath());
     }
 
     public List<BreadCrumbDto> getBreadCrumb(String path) {
