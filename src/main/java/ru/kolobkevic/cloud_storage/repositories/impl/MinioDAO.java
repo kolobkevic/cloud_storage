@@ -148,13 +148,6 @@ public class MinioDAO implements StorageDAO {
     }
 
     @Override
-    public void renameObject(String oldName, String newName) throws StorageServerException {
-
-        copyObject(oldName, newName);
-        removeObject(oldName);
-    }
-
-    @Override
     public ByteArrayResource downloadObject(String filePath) throws StorageServerException {
         GetObjectArgs objectArgs = GetObjectArgs.builder()
                 .bucket(bucketName)

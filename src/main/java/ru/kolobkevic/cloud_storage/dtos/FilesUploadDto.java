@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FilesDto {
+public class FilesUploadDto {
     private List<MultipartFile> files;
     private String username;
     private String path;
