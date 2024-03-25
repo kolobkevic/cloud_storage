@@ -25,6 +25,9 @@ import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.services.StorageService;
 import ru.kolobkevic.cloud_storage.utils.RedirectUtils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Controller
 @RequiredArgsConstructor
 
@@ -38,6 +41,7 @@ public class StorageController {
     public String getFiles(@AuthenticationPrincipal User user,
                            @RequestParam(value = "path", required = false, defaultValue = "") String path,
                            Model model) throws StorageServerException, StorageObjectNotFoundException {
+
         log.info("Path: " + path);
         model.addAttribute("breadCrumbsList", storageService.getBreadCrumb(path));
         model.addAttribute("files", storageService.getListOfObjects(user.getUsername(),
@@ -50,24 +54,23 @@ public class StorageController {
 
     @PostMapping("/storage/upload")
     public String uploadFile(@ModelAttribute("filesDto") FilesUploadDto filesUploadDto) throws StorageServerException {
-        storageService.uploadFile(filesUploadDto.getUsername(), filesUploadDto.getFiles(), filesUploadDto.getPath());
+        storageService.uploadFile(filesUploadDto);
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(filesUploadDto.getPath());
     }
 
     @PostMapping("/storage/uploadFolder")
     public String uploadFolder(@ModelAttribute("filesDto") FilesUploadDto filesUploadDto) throws StorageServerException,
             ObjectAlreadyExistsException {
-        storageService.uploadFolder(filesUploadDto.getUsername(), filesUploadDto.getFiles(), filesUploadDto.getPath());
+
+        storageService.uploadFolder(filesUploadDto);
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(filesUploadDto.getPath());
     }
 
     @PutMapping("/storage")
     public String renameFile(@ModelAttribute("fileRenameRequest") FileRenameDto fileRenameDto)
             throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
-        var username = fileRenameDto.getUsername();
-        var oldPath = fileRenameDto.getPath();
-        var newPath = fileRenameDto.getNewPath();
-        storageService.renameObject(username, oldPath, newPath);
+
+        storageService.renameObject(fileRenameDto);
         var redirection = storageService.getParentPath(fileRenameDto.getPath());
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(redirection);
     }
@@ -75,7 +78,8 @@ public class StorageController {
     @DeleteMapping("/storage")
     public String deleteFile(@ModelAttribute("fileRequest") FileDto fileDto)
             throws StorageServerException {
-        storageService.removeObject(fileDto.getUsername(), fileDto.getPath());
+
+        storageService.removeObject(fileDto);
         var redirection = storageService.getParentPath(fileDto.getPath());
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(redirection);
     }
@@ -84,10 +88,8 @@ public class StorageController {
 
     public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileDto fileDto)
             throws StorageServerException {
-        var objectName = fileDto.getPath();
-        var userName = fileDto.getUsername();
-        var filename = fileDto.getObjectName();
-        var file = storageService.downloadFile(userName, objectName);
+        var filename = URLEncoder.encode(fileDto.getObjectName(), StandardCharsets.UTF_8);
+        var file = storageService.downloadFile(fileDto);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=" + filename)
                 .body(file);
