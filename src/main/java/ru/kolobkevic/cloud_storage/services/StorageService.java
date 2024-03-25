@@ -66,7 +66,7 @@ public class StorageService {
             if (fileName == null) {
                 fileName = "";
             }
-            createFolderList(username, getParentPath(fileName));
+            createFolderList(username, path + getParentPath(fileName));
             try (var stream = file.getInputStream()) {
                 var objName = path + file.getOriginalFilename();
                 storageDAO.uploadObject(getUserFolderName(username) + objName, stream);
@@ -164,7 +164,7 @@ public class StorageService {
         var objects = getListOfObjects(username, oldName, true);
         for (var obj : objects) {
             var newPath = obj.getPath().replace(oldName, fullNewName);
-            storageDAO.renameObject(getUserFolderName(username) + obj.getPath(),
+            storageDAO.copyObject(getUserFolderName(username) + obj.getPath(),
                     getUserFolderName(username) + newPath);
         }
         storageDAO.removeObject(getUserFolderName(username) + oldName);
@@ -177,8 +177,9 @@ public class StorageService {
         if (isObjectExists(username, fullNewName)) {
             throw new ObjectAlreadyExistsException("Объект с таким именем уже существует");
         }
-        storageDAO.renameObject(getUserFolderName(username) + oldName,
+        storageDAO.copyObject(getUserFolderName(username) + oldName,
                 getUserFolderName(username) + fullNewName);
+        storageDAO.removeObject(getUserFolderName(username) + oldName);
     }
 
     private String getNewPath(String path, String newPath) {

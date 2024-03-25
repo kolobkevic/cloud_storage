@@ -1,13 +1,6 @@
 package ru.kolobkevic.cloud_storage.repositories.impl;
 
-import io.minio.CopyObjectArgs;
-import io.minio.CopySource;
-import io.minio.GetObjectArgs;
-import io.minio.ListObjectsArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectsArgs;
-import io.minio.Result;
+import io.minio.*;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
@@ -145,13 +138,6 @@ public class MinioDAO implements StorageDAO {
                 throw new StorageServerException(e.getMessage());
             }
         }
-    }
-
-    @Override
-    public void renameObject(String oldName, String newName) throws StorageServerException {
-
-        copyObject(oldName, newName);
-        removeObject(oldName);
     }
 
     @Override

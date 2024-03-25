@@ -112,7 +112,7 @@ class CloudStorageServiceTests {
 
         storageService.uploadFolder(username, List.of(mockFileWithName("apple/123.txt")), "");
         storageService.uploadFolder(username, List.of(mockFileWithName("456.txt")), "");
-        storageService.renameObject(username, "apple/123.txt", "apple/333.txt");
+        storageService.renameObject(username, "apple/123.txt", "333.txt");
         storageService.renameObject(username, "456.txt", "007.txt");
         Assertions.assertEquals(1, storageService.search(username, "333.txt").size());
         Assertions.assertEquals(1, storageService.search(username, "007.txt").size());

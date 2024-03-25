@@ -21,7 +21,5 @@ public interface StorageDAO {
 
     void removeObject(String filePath) throws StorageServerException;
 
-    void renameObject(String oldName, String newName) throws StorageServerException;
-
     ByteArrayResource downloadObject(String filePath) throws StorageServerException;
 }
