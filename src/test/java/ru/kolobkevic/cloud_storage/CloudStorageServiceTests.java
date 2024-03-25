@@ -44,7 +44,8 @@ class CloudStorageServiceTests {
     }
 
     @Test
-    void folderFoundWhenCreated() throws StorageServerException, StorageObjectNotFoundException {
+    void folderFoundWhenCreated() throws StorageServerException, StorageObjectNotFoundException,
+            ObjectAlreadyExistsException {
         storageService.createUserFolder(username);
 
         storageService.createFolderList(username, "folder");
@@ -61,7 +62,8 @@ class CloudStorageServiceTests {
     }
 
     @Test
-    void objectsFoundWhenCreated() throws StorageServerException, StorageObjectNotFoundException {
+    void objectsFoundWhenCreated() throws StorageServerException, StorageObjectNotFoundException,
+            ObjectAlreadyExistsException {
         storageService.createUserFolder(username);
 
         storageService.createFolderList(username, "apple/lemon");
@@ -74,7 +76,7 @@ class CloudStorageServiceTests {
     }
 
     @Test
-    void uploadFile() throws StorageServerException, StorageObjectNotFoundException {
+    void uploadFile() throws StorageServerException, StorageObjectNotFoundException, ObjectAlreadyExistsException {
         storageService.createUserFolder(username);
 
         storageService.createFolderList(username, "apple/lemon/");
@@ -85,7 +87,7 @@ class CloudStorageServiceTests {
     }
 
     @Test
-    void uploadFolder() throws StorageServerException, StorageObjectNotFoundException {
+    void uploadFolder() throws StorageServerException, StorageObjectNotFoundException, ObjectAlreadyExistsException {
         storageService.createUserFolder(username);
 
         storageService.uploadFolder(username,
@@ -98,7 +100,7 @@ class CloudStorageServiceTests {
     }
 
     @Test
-    void removeObject() throws StorageServerException, StorageObjectNotFoundException {
+    void removeObject() throws StorageServerException, StorageObjectNotFoundException, ObjectAlreadyExistsException {
         storageService.createUserFolder(username);
         storageService.uploadFolder(username, List.of(mockFileWithName("apple/123.txt")), "");
         storageService.removeObject(username, "apple/");

@@ -60,7 +60,7 @@ public class StorageService {
     }
 
     public void uploadFolder(String username, List<MultipartFile> files, String path)
-            throws StorageServerException {
+            throws StorageServerException, ObjectAlreadyExistsException {
         for (var file : files) {
             var fileName = file.getOriginalFilename();
             if (fileName == null) {
@@ -76,18 +76,17 @@ public class StorageService {
         }
     }
 
-    public void createFolderList(String username, String folderName) throws StorageServerException {
+    public void createFolderList(String username, String folderName) throws StorageServerException,
+            ObjectAlreadyExistsException {
         if (!folderName.endsWith("/")) {
             folderName = folderName + "/";
         }
-        var folderNames = folderName.split("/");
+        var folderNames = Arrays.stream(folderName.split("/")).skip(0).toList();
         StringBuilder name = new StringBuilder();
         for (var objectName : folderNames) {
-            try {
-                name.append(objectName).append("/");
+            name.append(objectName).append("/");
+            if (!isObjectExists(username, name.toString())) {
                 createFolder(username, name.toString());
-            } catch (ObjectAlreadyExistsException ignore) {
-
             }
         }
     }
