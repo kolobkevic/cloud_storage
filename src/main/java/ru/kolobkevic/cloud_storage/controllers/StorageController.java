@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.kolobkevic.cloud_storage.dtos.FilesDto;
-import ru.kolobkevic.cloud_storage.dtos.FileRenameRequestDto;
-import ru.kolobkevic.cloud_storage.dtos.FileRequestDto;
+import ru.kolobkevic.cloud_storage.dtos.FilesUploadDto;
+import ru.kolobkevic.cloud_storage.dtos.FileRenameDto;
+import ru.kolobkevic.cloud_storage.dtos.FileDto;
 import ru.kolobkevic.cloud_storage.dtos.FolderRenameDto;
 import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
@@ -49,44 +49,44 @@ public class StorageController {
     }
 
     @PostMapping("/storage/upload")
-    public String uploadFile(@ModelAttribute("filesDto") FilesDto filesDto) throws StorageServerException {
-        storageService.uploadFile(filesDto.getUsername(), filesDto.getFiles(), filesDto.getPath());
-        return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(filesDto.getPath());
+    public String uploadFile(@ModelAttribute("filesDto") FilesUploadDto filesUploadDto) throws StorageServerException {
+        storageService.uploadFile(filesUploadDto.getUsername(), filesUploadDto.getFiles(), filesUploadDto.getPath());
+        return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(filesUploadDto.getPath());
     }
 
     @PostMapping("/storage/uploadFolder")
-    public String uploadFolder(@ModelAttribute("filesDto") FilesDto filesDto) throws StorageServerException,
+    public String uploadFolder(@ModelAttribute("filesDto") FilesUploadDto filesUploadDto) throws StorageServerException,
             ObjectAlreadyExistsException {
-        storageService.uploadFolder(filesDto.getUsername(), filesDto.getFiles(), filesDto.getPath());
-        return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(filesDto.getPath());
+        storageService.uploadFolder(filesUploadDto.getUsername(), filesUploadDto.getFiles(), filesUploadDto.getPath());
+        return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(filesUploadDto.getPath());
     }
 
     @PutMapping("/storage")
-    public String renameFile(@ModelAttribute("fileRenameRequest") FileRenameRequestDto fileRenameRequestDto)
+    public String renameFile(@ModelAttribute("fileRenameRequest") FileRenameDto fileRenameDto)
             throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
-        var username = fileRenameRequestDto.getUsername();
-        var oldPath = fileRenameRequestDto.getPath();
-        var newPath = fileRenameRequestDto.getNewPath();
+        var username = fileRenameDto.getUsername();
+        var oldPath = fileRenameDto.getPath();
+        var newPath = fileRenameDto.getNewPath();
         storageService.renameObject(username, oldPath, newPath);
-        var redirection = storageService.getParentPath(fileRenameRequestDto.getPath());
+        var redirection = storageService.getParentPath(fileRenameDto.getPath());
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(redirection);
     }
 
     @DeleteMapping("/storage")
-    public String deleteFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto)
+    public String deleteFile(@ModelAttribute("fileRequest") FileDto fileDto)
             throws StorageServerException {
-        storageService.removeObject(fileRequestDto.getUsername(), fileRequestDto.getPath());
-        var redirection = storageService.getParentPath(fileRequestDto.getPath());
+        storageService.removeObject(fileDto.getUsername(), fileDto.getPath());
+        var redirection = storageService.getParentPath(fileDto.getPath());
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(redirection);
     }
 
     @GetMapping(value = "/storage/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 
-    public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileRequestDto fileRequestDto)
+    public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileDto fileDto)
             throws StorageServerException {
-        var objectName = fileRequestDto.getPath();
-        var userName = fileRequestDto.getUsername();
-        var filename = fileRequestDto.getObjectName();
+        var objectName = fileDto.getPath();
+        var userName = fileDto.getUsername();
+        var filename = fileDto.getObjectName();
         var file = storageService.downloadFile(userName, objectName);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=" + filename)
