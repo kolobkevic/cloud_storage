@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.kolobkevic.cloud_storage.dtos.*;
+import ru.kolobkevic.cloud_storage.dtos.FileDto;
+import ru.kolobkevic.cloud_storage.dtos.FileRenameDto;
+import ru.kolobkevic.cloud_storage.dtos.FilesUploadDto;
+import ru.kolobkevic.cloud_storage.dtos.FolderDto;
 import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
@@ -103,7 +106,7 @@ public class StorageController {
     }
 
     @PostMapping("/storage/create")
-    public String createFolder(@ModelAttribute("fileRequest") FolderDto folderDto)
+    public String createFolder(@ModelAttribute("folderDto") FolderDto folderDto)
             throws StorageServerException, ObjectAlreadyExistsException {
 
         storageService.createFolderList(folderDto.getUsername(),

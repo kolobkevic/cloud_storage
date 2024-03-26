@@ -7,7 +7,7 @@
             </div>
             <div class="modal-body">
                 <form th:action="@{/storage/create}" id="fileCreateForm" th:method="post"
-                      th:object="${fileRequest}">
+                      th:object="${folderDto}">
                     <div class="mb-3">
                         <input type="text" class="form-control" th:name="objectName">
                     </div>
