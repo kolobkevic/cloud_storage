@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FolderRenameDto extends FolderDto{
-    private String newPath;
+public class FolderDto {
+    private String objectName;
+    private String path;
+    private String username;
 }

@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.kolobkevic.cloud_storage.dtos.FilesUploadDto;
-import ru.kolobkevic.cloud_storage.dtos.FileRenameDto;
-import ru.kolobkevic.cloud_storage.dtos.FileDto;
-import ru.kolobkevic.cloud_storage.dtos.FolderRenameDto;
+import ru.kolobkevic.cloud_storage.dtos.*;
 import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
@@ -106,11 +103,11 @@ public class StorageController {
     }
 
     @PostMapping("/storage/create")
-    public String createFolder(@ModelAttribute("fileRequest") FolderRenameDto folderRenameDto)
+    public String createFolder(@ModelAttribute("fileRequest") FolderDto folderDto)
             throws StorageServerException, ObjectAlreadyExistsException {
 
-        storageService.createFolderList(folderRenameDto.getUsername(),
-                folderRenameDto.getPath() + folderRenameDto.getNewPath());
-        return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(folderRenameDto.getPath());
+        storageService.createFolderList(folderDto.getUsername(),
+                folderDto.getPath() + folderDto.getObjectName());
+        return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(folderDto.getPath());
     }
 }

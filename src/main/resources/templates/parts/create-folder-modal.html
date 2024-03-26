@@ -9,11 +9,10 @@
                 <form th:action="@{/storage/create}" id="fileCreateForm" th:method="post"
                       th:object="${fileRequest}">
                     <div class="mb-3">
-                        <input type="text" class="form-control" th:name="newPath">
+                        <input type="text" class="form-control" th:name="objectName">
                     </div>
                     <input th:name="path" th:value="${path}" type="hidden">
                     <input th:name="username" th:value="${username}" type="hidden">
-                    <input th:name="objectName" th:value="${objectName}" type="hidden">
                 </form>
             </div>
             <div class="modal-footer">
