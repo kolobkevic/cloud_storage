@@ -7,7 +7,7 @@
             </div>
             <div class="modal-body">
                 <form enctype="multipart/form-data" id="folderUploadForm" method="post" th:object="${filesDto}"
-                      th:action="@{/storage/uploadFolder}">
+                      th:action="@{/storage/upload}">
                     <input type="file" name="files" class="form-control" required webkitdirectory>
                     <input th:name="path" th:value="${path}" type="hidden">
                     <input th:name="username" th:value="${username}" type="hidden">

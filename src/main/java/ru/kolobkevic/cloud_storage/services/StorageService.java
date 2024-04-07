@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import ru.kolobkevic.cloud_storage.dtos.BreadCrumbDto;
-import ru.kolobkevic.cloud_storage.dtos.FileDto;
-import ru.kolobkevic.cloud_storage.dtos.FileRenameDto;
+import ru.kolobkevic.cloud_storage.dtos.StorageObjDto;
+import ru.kolobkevic.cloud_storage.dtos.StorageObjRenameDto;
 import ru.kolobkevic.cloud_storage.dtos.FilesUploadDto;
 import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
@@ -109,15 +109,15 @@ public class StorageService {
         storageDAO.createFolder(getUserFolderName(username) + folderName);
     }
 
-    public void removeObject(FileDto fileDto) throws StorageServerException {
-        storageDAO.removeObject(getUserFolderName(fileDto.getUsername()) + fileDto.getPath());
+    public void removeObject(StorageObjDto storageObjDto) throws StorageServerException {
+        storageDAO.removeObject(getUserFolderName(storageObjDto.getUsername()) + storageObjDto.getPath());
     }
 
-    public void renameObject(FileRenameDto fileRenameDto)
+    public void renameObject(StorageObjRenameDto storageObjectRenameDto)
             throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
-        var username = fileRenameDto.getUsername();
-        var oldName = fileRenameDto.getPath();
-        var newName = fileRenameDto.getNewPath();
+        var username = storageObjectRenameDto.getUsername();
+        var oldName = storageObjectRenameDto.getPath();
+        var newName = storageObjectRenameDto.getNewPath();
 
         if (oldName.endsWith("/")) {
             renameFolder(username, oldName, newName);
@@ -137,8 +137,9 @@ public class StorageService {
         return !objects.isEmpty();
     }
 
-    public ByteArrayResource downloadFile(FileDto fileDto) throws StorageServerException {
-        return storageDAO.downloadObject(getUserFolderName(fileDto.getUsername()) + fileDto.getPath());
+    public ByteArrayResource downloadFile(StorageObjDto storageObjDto) throws StorageServerException {
+        return storageDAO.downloadObject(
+                getUserFolderName(storageObjDto.getUsername()) + storageObjDto.getPath());
     }
 
     public List<BreadCrumbDto> getBreadCrumb(String path) {

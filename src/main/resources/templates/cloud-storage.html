@@ -39,6 +39,7 @@
         <div th:replace="~{parts/create-folder-modal :: create-folder-modal}"></div>
     </div>
 
+    <!--    Folders-->
     <div th:if="${files}">
         <h6 class="mb-3">Папки</h6>
         <div class="row row-cols-1 row-cols-md-5 g-4">
@@ -75,7 +76,7 @@
                                 <!-- Folder Delete -->
                                 <li>
                                     <form th:action="@{/storage}" th:method="delete"
-                                          th:object="${fileRequest}">
+                                          th:object="${StorageObject}">
                                         <input th:name="path" th:value="${file.path}" type="hidden">
                                         <input th:name="username" th:value="${username}" type="hidden">
                                         <input th:name="objectName" th:value="${file.objectName}" type="hidden">
@@ -121,7 +122,7 @@
                                 <!--File Download -->
                                 <li>
                                     <form th:action="@{/storage/download}" th:method="get"
-                                          th:object="${fileRequest}">
+                                          th:object="${StorageObject}">
                                         <input th:name="path" th:value="${file.path}" type="hidden">
                                         <input th:name="username" th:value="${username}" type="hidden">
                                         <input th:name="objectName" th:value="${file.objectName}" type="hidden">
@@ -141,7 +142,7 @@
                                 <!-- File Delete -->
                                 <li>
                                     <form th:action="@{/storage}" th:method="delete"
-                                          th:object="${fileRequest}">
+                                          th:object="${StorageObject}">
                                         <input th:name="path" th:value="${file.path}" type="hidden">
                                         <input th:name="username" th:value="${username}" type="hidden">
                                         <input th:name="objectName" th:value="${file.objectName}" type="hidden">
@@ -157,6 +158,14 @@
                 <div th:replace="~{parts/rename-modal :: rename}"></div>
 
             </div>
+        </div>
+    </div>
+
+    <!--Alerts-->
+    <div class="row">
+        <div th:if="${failureAlert}" class="container col-auto alert alert-dismissible alert-danger fade show">
+            <span th:text="${failureAlert}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     </div>
 </div>

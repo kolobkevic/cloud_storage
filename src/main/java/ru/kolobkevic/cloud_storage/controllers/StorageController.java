@@ -1,5 +1,6 @@
 package ru.kolobkevic.cloud_storage.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -9,16 +10,17 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.kolobkevic.cloud_storage.dtos.StorageObjDto;
+import ru.kolobkevic.cloud_storage.dtos.StorageObjRenameDto;
 import ru.kolobkevic.cloud_storage.dtos.FilesUploadDto;
-import ru.kolobkevic.cloud_storage.dtos.FileRenameDto;
-import ru.kolobkevic.cloud_storage.dtos.FileDto;
-import ru.kolobkevic.cloud_storage.dtos.FolderRenameDto;
 import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
@@ -48,48 +50,47 @@ public class StorageController {
                 path, false));
         model.addAttribute("username", user.getUsername());
         model.addAttribute("path", path);
+        model.addAttribute("StorageObjectDto", new StorageObjDto());
 
         return "cloud-storage";
     }
 
     @PostMapping("/storage/upload")
-    public String uploadFile(@ModelAttribute("filesDto") FilesUploadDto filesUploadDto) throws StorageServerException {
+    public String uploadFiles(@ModelAttribute("filesDto") FilesUploadDto filesUploadDto) throws StorageServerException {
         storageService.uploadFile(filesUploadDto);
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(filesUploadDto.getPath());
     }
 
-    @PostMapping("/storage/uploadFolder")
-    public String uploadFolder(@ModelAttribute("filesDto") FilesUploadDto filesUploadDto) throws StorageServerException,
-            ObjectAlreadyExistsException {
-
-        storageService.uploadFolder(filesUploadDto);
-        return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(filesUploadDto.getPath());
-    }
-
     @PutMapping("/storage")
-    public String renameFile(@ModelAttribute("fileRenameRequest") FileRenameDto fileRenameDto)
+    public String renameObject(@ModelAttribute("StorageObjectRenameRequest")
+                               @Valid StorageObjRenameDto storageObjectRenameDto,
+                               BindingResult bindingResult, RedirectAttributes redirectAttributes)
             throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
-
-        storageService.renameObject(fileRenameDto);
-        var redirection = storageService.getParentPath(fileRenameDto.getPath());
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("failureAlert",
+                    bindingResult.getFieldError().getDefaultMessage());
+        } else {
+            storageService.renameObject(storageObjectRenameDto);
+        }
+        var redirection = storageService.getParentPath(storageObjectRenameDto.getPath());
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(redirection);
     }
 
     @DeleteMapping("/storage")
-    public String deleteFile(@ModelAttribute("fileRequest") FileDto fileDto)
+    public String deleteObject(@ModelAttribute("StorageObject") StorageObjDto storageObjDto)
             throws StorageServerException {
 
-        storageService.removeObject(fileDto);
-        var redirection = storageService.getParentPath(fileDto.getPath());
+        storageService.removeObject(storageObjDto);
+        var redirection = storageService.getParentPath(storageObjDto.getPath());
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(redirection);
     }
 
     @GetMapping(value = "/storage/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 
-    public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("fileRequest") FileDto fileDto)
+    public ResponseEntity<ByteArrayResource> downloadFile(@ModelAttribute("StorageObject") StorageObjDto storageObjDto)
             throws StorageServerException {
-        var filename = URLEncoder.encode(fileDto.getObjectName(), StandardCharsets.UTF_8);
-        var file = storageService.downloadFile(fileDto);
+        var filename = URLEncoder.encode(storageObjDto.getObjectName(), StandardCharsets.UTF_8);
+        var file = storageService.downloadFile(storageObjDto);
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=" + filename)
                 .body(file);
@@ -106,11 +107,16 @@ public class StorageController {
     }
 
     @PostMapping("/storage/create")
-    public String createFolder(@ModelAttribute("fileRequest") FolderRenameDto folderRenameDto)
+    public String createFolder(@ModelAttribute("folderDto") @Valid StorageObjDto storageObjDto,
+                               BindingResult bindingResult, RedirectAttributes redirectAttributes)
             throws StorageServerException, ObjectAlreadyExistsException {
-
-        storageService.createFolderList(folderRenameDto.getUsername(),
-                folderRenameDto.getPath() + folderRenameDto.getNewPath());
-        return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(folderRenameDto.getPath());
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("failureAlert",
+                    bindingResult.getFieldError().getDefaultMessage());
+        } else {
+            storageService.createFolderList(storageObjDto.getUsername(),
+                    storageObjDto.getPath() + storageObjDto.getObjectName());
+        }
+        return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(storageObjDto.getPath());
     }
 }
