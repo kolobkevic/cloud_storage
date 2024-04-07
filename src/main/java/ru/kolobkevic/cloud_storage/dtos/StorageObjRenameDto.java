@@ -1,5 +1,7 @@
 package ru.kolobkevic.cloud_storage.dtos;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Component;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FolderRenameDto extends FolderDto{
+public class StorageObjRenameDto extends StorageObjDto {
+    @NotEmpty
+    @Pattern(regexp = "^[^\\\\\"$%&#'^*!?]*$", message = "Недопустимый символ в названии")
     private String newPath;
 }

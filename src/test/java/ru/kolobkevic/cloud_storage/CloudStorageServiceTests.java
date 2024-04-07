@@ -7,8 +7,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.testcontainers.containers.MinIOContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import ru.kolobkevic.cloud_storage.dtos.FileDto;
-import ru.kolobkevic.cloud_storage.dtos.FileRenameDto;
+import ru.kolobkevic.cloud_storage.dtos.StorageObjDto;
+import ru.kolobkevic.cloud_storage.dtos.StorageObjRenameDto;
 import ru.kolobkevic.cloud_storage.dtos.FilesUploadDto;
 import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
@@ -28,7 +28,7 @@ class CloudStorageServiceTests {
     StorageService storageService;
 
     FilesUploadDto file, folderWithFiles_1, folderWithFiles_2, folderWithFiles_3, folderWithFiles_4;
-    FileRenameDto obj_1, obj_2, obj_3;
+    StorageObjRenameDto obj_1, obj_2, obj_3;
 
     @Container
     private static MinIOContainer minIOContainer = new MinIOContainer("minio/minio:latest")
@@ -50,17 +50,17 @@ class CloudStorageServiceTests {
         folderWithFiles_4 = new FilesUploadDto(List.of(mockFileWithName("456.txt")),
                 username, "");
 
-        obj_1 = new FileRenameDto();
+        obj_1 = new StorageObjRenameDto();
         obj_1.setPath("apple/123.txt");
         obj_1.setNewPath("333.txt");
         obj_1.setUsername(username);
 
-        obj_2 = new FileRenameDto();
+        obj_2 = new StorageObjRenameDto();
         obj_2.setPath("456.txt");
         obj_2.setNewPath("007.txt");
         obj_2.setUsername(username);
 
-        obj_3 = new FileRenameDto();
+        obj_3 = new StorageObjRenameDto();
         obj_3.setPath("apple/");
         obj_3.setNewPath("lemon/");
         obj_3.setUsername(username);
@@ -70,7 +70,7 @@ class CloudStorageServiceTests {
 
     @AfterEach
     void deleteTestFolder() throws StorageServerException {
-        storageService.removeObject(new FileDto("", "", username));
+        storageService.removeObject(new StorageObjDto("", "", username));
     }
 
     @Test
@@ -129,7 +129,7 @@ class CloudStorageServiceTests {
     @Test
     void removeObject() throws StorageServerException, StorageObjectNotFoundException, ObjectAlreadyExistsException {
         storageService.uploadFolder(folderWithFiles_2);
-        storageService.removeObject(new FileDto("", "apple/", username));
+        storageService.removeObject(new StorageObjDto("", "apple/", username));
         Assertions.assertEquals(0, storageService.search(username, "123").size());
         Assertions.assertEquals(0, storageService.search(username, "apple").size());
     }

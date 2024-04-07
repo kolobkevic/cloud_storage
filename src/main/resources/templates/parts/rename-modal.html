@@ -7,7 +7,7 @@
             </div>
             <div class="modal-body">
                 <form th:action="@{/storage}" th:id="|rename-form-${fileStat.index}|" th:method="put"
-                      th:object="${fileRenameRequest}">
+                      th:object="${StorageObjectRenameRequest}">
                     <div class="mb-3">
                         <input type="text" class="form-control" th:name="newPath" th:value="${file.objectName}">
                     </div>
@@ -19,7 +19,8 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                 <button type="submit" class="btn btn-primary"
-                        th:attr="form=|rename-form-${fileStat.index}|">Переименовать</button>
+                        th:attr="form=|rename-form-${fileStat.index}|">Переименовать
+                </button>
             </div>
         </div>
     </div>
