@@ -20,7 +20,7 @@ import ru.kolobkevic.cloud_storage.services.UserService;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-public class RegistrationController {
+public class AuthController {
     private final UserService userService;
     private final StorageService storageService;
     private static final String REGISTRATION_PAGE = "auth/registration";
