@@ -1,21 +1,19 @@
-package ru.kolobkevic.cloud_storage.dtos;
+package ru.kolobkevic.cloud_storage.utils;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 @Getter
 @Setter
 @NoArgsConstructor
-public class BreadCrumbDto {
+public class BreadCrumb {
     private List<String> breadCrumbs;
     private String breadCrumbName;
 
-    public BreadCrumbDto(List<String> breadCrumbsList) {
+    public BreadCrumb(List<String> breadCrumbsList) {
         breadCrumbs = breadCrumbsList;
         breadCrumbName = breadCrumbsList.get(breadCrumbsList.size() - 1);
     }

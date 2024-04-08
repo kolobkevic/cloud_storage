@@ -3,7 +3,7 @@ package ru.kolobkevic.cloud_storage.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
-import ru.kolobkevic.cloud_storage.dtos.BreadCrumbDto;
+import ru.kolobkevic.cloud_storage.utils.BreadCrumb;
 import ru.kolobkevic.cloud_storage.dtos.StorageObjDto;
 import ru.kolobkevic.cloud_storage.dtos.StorageObjRenameDto;
 import ru.kolobkevic.cloud_storage.dtos.FilesUploadDto;
@@ -142,12 +142,12 @@ public class StorageService {
                 getUserFolderName(storageObjDto.getUsername()) + storageObjDto.getPath());
     }
 
-    public List<BreadCrumbDto> getBreadCrumb(String path) {
+    public List<BreadCrumb> getBreadCrumb(String path) {
         var segments = Arrays.stream(path.split("/")).toList();
-        var breadCrumbList = new ArrayList<BreadCrumbDto>();
+        var breadCrumbList = new ArrayList<BreadCrumb>();
 
         for (int i = 0; i < segments.size(); i++) {
-            breadCrumbList.add(new BreadCrumbDto(segments.subList(0, i + 1)));
+            breadCrumbList.add(new BreadCrumb(segments.subList(0, i + 1)));
         }
 
         return path.isEmpty() ? Collections.emptyList() : breadCrumbList;
