@@ -32,15 +32,15 @@ public class User {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @Size(min = 2, max = 20, message = "Длина имени должна быть больше 2 и меньше 20 букв")
+    @Size(min = 2, max = 20, message = "Длина имени должна быть больше 1 и меньше 21 буквы")
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Size(min = 2, max = 30, message = "Длина фамилии должна быть больше 2 и меньше 30 букв")
+    @Size(min = 2, max = 30, message = "Длина фамилии должна быть больше 1 и меньше 31 буквы")
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Size(min = 6, max = 20, message = "Длина пароля должна быть больше 6 и меньше 20 символов")
+    @Size(min = 6, max = 64, message = "Длина пароля должна быть больше 5 и меньше 65 символов")
     @Column(name = "password")
     private String password;
 

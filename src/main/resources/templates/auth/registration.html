@@ -27,7 +27,7 @@
     <div class="form-floating">
         <input type="password" class="form-control" id="password" placeholder="Password" name="password">
         <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color: red">Пароль содержит ошибки</div>
-        <label for="password">Пароль (6-20 символов)</label>
+        <label for="password">Пароль (6-64 символов)</label>
     </div>
 
     <button class="w-100 btn btn-lg btn-primary" type="submit">Зарегистрироваться</button>
