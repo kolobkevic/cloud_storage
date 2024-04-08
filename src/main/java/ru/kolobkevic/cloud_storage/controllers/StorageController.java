@@ -115,7 +115,7 @@ public class StorageController {
             redirectAttributes.addFlashAttribute("failureAlert",
                     bindingResult.getFieldError().getDefaultMessage());
         } else {
-            storageService.createFolderList(storageObjDto.getUsername(),
+            storageService.createFolder(storageObjDto.getUsername(),
                     storageObjDto.getPath() + storageObjDto.getObjectName());
         }
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(storageObjDto.getPath());

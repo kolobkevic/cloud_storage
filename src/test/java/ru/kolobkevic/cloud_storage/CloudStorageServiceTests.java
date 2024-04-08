@@ -82,16 +82,16 @@ class CloudStorageServiceTests {
     void folderFoundWhenCreated() throws StorageServerException, StorageObjectNotFoundException,
             ObjectAlreadyExistsException {
 
-        storageService.createFolderList(username, "folder");
+        storageService.createFolder(username, "folder");
         Assertions.assertEquals(1, storageService.search(username, "folder").size());
 
-        storageService.createFolderList(username, "folder2");
+        storageService.createFolder(username, "folder2");
         Assertions.assertEquals(2, storageService.search(username, "folder").size());
 
-        storageService.createFolderList(username, "new");
+        storageService.createFolder(username, "new");
         Assertions.assertEquals(1, storageService.search(username, "new").size());
 
-        storageService.createFolderList(username, "new/dir");
+        storageService.createFolder(username, "new/dir");
         Assertions.assertEquals(1, storageService.search(username, "dir").size());
     }
 
@@ -99,19 +99,15 @@ class CloudStorageServiceTests {
     void objectsFoundWhenCreated() throws StorageServerException, StorageObjectNotFoundException,
             ObjectAlreadyExistsException {
         storageService.createUserFolder(username);
+        storageService.createFolder(username, "apple/lemon");
 
-        storageService.createFolderList(username, "apple/lemon");
-
-        Assertions.assertEquals(1,
-                storageService.search(username, "apple").size());
-
-        Assertions.assertEquals(1,
-                storageService.search(username, "lemon").size());
+        Assertions.assertEquals(1, storageService.search(username, "apple").size());
+        Assertions.assertEquals(1, storageService.search(username, "lemon").size());
     }
 
     @Test
     void uploadFile() throws StorageServerException, StorageObjectNotFoundException, ObjectAlreadyExistsException {
-        storageService.createFolderList(username, "apple/lemon/");
+        storageService.createFolder(username, "apple/lemon/");
         storageService.uploadFile(file);
         Assertions.assertEquals(1, storageService.search(username, "123.txt").size());
         Assertions.assertEquals(3,
