@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
-import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
+import ru.kolobkevic.cloud_storage.repositories.StorageS3;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -28,7 +28,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class MinioDAO implements StorageDAO {
+public class MinioS3Impl implements StorageS3 {
     private final MinioClient minioClient;
 
     @Value("${minio.bucket}")

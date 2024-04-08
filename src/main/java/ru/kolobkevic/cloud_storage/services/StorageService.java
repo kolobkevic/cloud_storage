@@ -11,7 +11,7 @@ import ru.kolobkevic.cloud_storage.exceptions.ObjectAlreadyExistsException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
-import ru.kolobkevic.cloud_storage.repositories.StorageDAO;
+import ru.kolobkevic.cloud_storage.repositories.StorageS3;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,10 +21,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class StorageService {
-    private final StorageDAO storageDAO;
+    private final StorageS3 storageS3;
 
     public void createUserFolder(String username) throws StorageServerException {
-        storageDAO.createFolder(getUserFolderName(username));
+        storageS3.createFolder(getUserFolderName(username));
     }
 
     public String getUserFolderName(String username) {
@@ -34,7 +34,7 @@ public class StorageService {
     public List<StorageObject> getListOfObjects(String username, String objectName, boolean isRecursive)
             throws StorageServerException, StorageObjectNotFoundException {
         var objName = getUserFolderName(username) + objectName;
-        var allObjects = storageDAO.getListOfObjects(objName, isRecursive);
+        var allObjects = storageS3.getListOfObjects(objName, isRecursive);
         List<StorageObject> objects = new ArrayList<>();
         for (var obj : allObjects) {
             if (obj.isDir()) {
@@ -57,7 +57,7 @@ public class StorageService {
         for (var file : files) {
             try (var stream = file.getInputStream()) {
                 var objName = path + file.getOriginalFilename();
-                storageDAO.uploadObject(getUserFolderName(username) + objName, stream);
+                storageS3.uploadObject(getUserFolderName(username) + objName, stream);
             } catch (Exception e) {
                 throw new StorageServerException(e.getMessage());
             }
@@ -78,7 +78,7 @@ public class StorageService {
             createFolderList(username, path + getParentPath(fileName));
             try (var stream = file.getInputStream()) {
                 var objName = path + file.getOriginalFilename();
-                storageDAO.uploadObject(getUserFolderName(username) + objName, stream);
+                storageS3.uploadObject(getUserFolderName(username) + objName, stream);
             } catch (Exception e) {
                 throw new StorageServerException(e.getMessage());
             }
@@ -106,11 +106,11 @@ public class StorageService {
         if (isObjectExists(username, folderName)) {
             throw new ObjectAlreadyExistsException("Объект с именем " + folderName + " уже существует");
         }
-        storageDAO.createFolder(getUserFolderName(username) + folderName);
+        storageS3.createFolder(getUserFolderName(username) + folderName);
     }
 
     public void removeObject(StorageObjDto storageObjDto) throws StorageServerException {
-        storageDAO.removeObject(getUserFolderName(storageObjDto.getUsername()) + storageObjDto.getPath());
+        storageS3.removeObject(getUserFolderName(storageObjDto.getUsername()) + storageObjDto.getPath());
     }
 
     public void renameObject(StorageObjRenameDto storageObjectRenameDto)
@@ -138,7 +138,7 @@ public class StorageService {
     }
 
     public ByteArrayResource downloadFile(StorageObjDto storageObjDto) throws StorageServerException {
-        return storageDAO.downloadObject(
+        return storageS3.downloadObject(
                 getUserFolderName(storageObjDto.getUsername()) + storageObjDto.getPath());
     }
 
@@ -177,10 +177,10 @@ public class StorageService {
         var objects = getListOfObjects(username, oldName, true);
         for (var obj : objects) {
             var newPath = obj.getPath().replace(oldName, fullNewName);
-            storageDAO.copyObject(getUserFolderName(username) + obj.getPath(),
+            storageS3.copyObject(getUserFolderName(username) + obj.getPath(),
                     getUserFolderName(username) + newPath);
         }
-        storageDAO.removeObject(getUserFolderName(username) + oldName);
+        storageS3.removeObject(getUserFolderName(username) + oldName);
     }
 
     private void renameFile(String username, String oldName, String newName) throws StorageServerException,
@@ -190,9 +190,9 @@ public class StorageService {
         if (isObjectExists(username, fullNewName)) {
             throw new ObjectAlreadyExistsException("Объект с таким именем уже существует");
         }
-        storageDAO.copyObject(getUserFolderName(username) + oldName,
+        storageS3.copyObject(getUserFolderName(username) + oldName,
                 getUserFolderName(username) + fullNewName);
-        storageDAO.removeObject(getUserFolderName(username) + oldName);
+        storageS3.removeObject(getUserFolderName(username) + oldName);
     }
 
     private String getNewPath(String path, String newPath) {
