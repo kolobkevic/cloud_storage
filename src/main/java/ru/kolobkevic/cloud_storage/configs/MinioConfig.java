@@ -31,20 +31,21 @@ public class MinioConfig {
     private String bucketName;
 
     @Bean
-    public MinioClient getMinioClient() {
-        return MinioClient.builder()
+    public MinioClient getMinioClient() throws ServerException, InsufficientDataException,
+            ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException,
+            InvalidResponseException, XmlParserException, InternalException {
+        MinioClient minioClient = MinioClient.builder()
                 .endpoint(url, port, false)
                 .credentials(accessKey, secretKey)
                 .build();
+        createBucketIfNotExists(minioClient);
+        return minioClient;
     }
 
-    @Bean
-    public void createBucketIfNotExists() throws
+    public void createBucketIfNotExists(MinioClient minioClient) throws
             ServerException, InsufficientDataException, ErrorResponseException,
             IOException, NoSuchAlgorithmException, InvalidKeyException,
             InvalidResponseException, XmlParserException, InternalException {
-
-        MinioClient minioClient = getMinioClient();
 
         if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
