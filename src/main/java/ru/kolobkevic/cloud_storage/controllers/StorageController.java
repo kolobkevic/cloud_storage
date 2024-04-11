@@ -67,13 +67,14 @@ public class StorageController {
                                @Valid StorageObjRenameDto storageObjectRenameDto,
                                BindingResult bindingResult, RedirectAttributes redirectAttributes)
             throws ObjectAlreadyExistsException, StorageServerException, StorageObjectNotFoundException {
+        var redirection = storageService.getParentPath(storageObjectRenameDto.getPath());
+
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("failureAlert",
                     bindingResult.getFieldError().getDefaultMessage());
-        } else {
-            storageService.renameObject(storageObjectRenameDto);
+            return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(redirection);
         }
-        var redirection = storageService.getParentPath(storageObjectRenameDto.getPath());
+        storageService.renameObject(storageObjectRenameDto);
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(redirection);
     }
 
@@ -114,10 +115,11 @@ public class StorageController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("failureAlert",
                     bindingResult.getFieldError().getDefaultMessage());
-        } else {
-            storageService.createFolder(storageObjDto.getUsername(),
-                    storageObjDto.getPath() + storageObjDto.getObjectName());
+            return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(storageObjDto.getPath());
         }
+        storageService.createFolder(storageObjDto.getUsername(),
+                storageObjDto.getPath() + storageObjDto.getObjectName());
+
         return PAGE_REDIRECTION_PREFIX + redirectUtils.getRedirectPath(storageObjDto.getPath());
     }
 }
