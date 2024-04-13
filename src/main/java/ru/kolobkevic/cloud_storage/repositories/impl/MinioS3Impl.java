@@ -12,9 +12,9 @@ import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Component;
+import ru.kolobkevic.cloud_storage.configs.MinioProperties;
 import ru.kolobkevic.cloud_storage.exceptions.StorageObjectNotFoundException;
 import ru.kolobkevic.cloud_storage.exceptions.StorageServerException;
 import ru.kolobkevic.cloud_storage.models.StorageObject;
@@ -30,19 +30,13 @@ import java.util.List;
 @Slf4j
 public class MinioS3Impl implements StorageS3 {
     private final MinioClient minioClient;
+    private final MinioProperties minioProperties;
 
-    @Value("${minio.bucket}")
-    private String bucketName;
-    @Value("${url.schema}")
-    private String schema;
-    @Value("${url.port}")
-    private String port;
-    @Value("${url.host}")
-    private String hostName;
+    private final String bucketName = minioProperties.getBucket();
     private static final int PART_SIZE = 104857600;
 
     private Iterable<Result<Item>> getObjects(String objectName, boolean isRecursive) {
-        log.info("Getting list of objects with name " + objectName + " from bucket " + bucketName);
+        log.debug("Getting list of objects with name {} from bucket {}", objectName, bucketName);
         return minioClient.listObjects(
                 ListObjectsArgs.builder()
                         .bucket(bucketName)
@@ -64,13 +58,13 @@ public class MinioS3Impl implements StorageS3 {
             for (var minioObject : minioObjects) {
                 Item item = minioObject.get();
                 String path = item.objectName();
-                log.info("item.objectName: " + path);
+                log.debug("item.objectName: {}", path);
 
                 boolean isDir = item.isDir() || path.endsWith("/");
-                log.info("item is directory: " + isDir);
+                log.debug("item is directory: {}", isDir);
 
                 String displayName = getFolderName(path);
-                log.info("displayName: " + displayName);
+                log.debug("displayName: {}", displayName);
 
                 files.add(new StorageObject(displayName, path, isDir));
             }
@@ -82,7 +76,7 @@ public class MinioS3Impl implements StorageS3 {
 
     @Override
     public void uploadObject(String filePath, InputStream in) throws StorageServerException {
-        log.info("Uploading objects with name " + filePath + " from bucket " + bucketName);
+        log.debug("Uploading objects with name {} from bucket {}", filePath, bucketName);
         try {
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
@@ -96,7 +90,7 @@ public class MinioS3Impl implements StorageS3 {
 
     @Override
     public void createFolder(String filePath) throws StorageServerException {
-        log.info("Creating folder with name " + filePath + " from bucket " + bucketName);
+        log.debug("Creating folder with name {} from bucket {}", filePath, bucketName);
         try {
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
@@ -110,7 +104,7 @@ public class MinioS3Impl implements StorageS3 {
 
     @Override
     public void copyObject(String filePath, String newPath) throws StorageServerException {
-        log.info("Copying objects from " + filePath + " to " + newPath + " from bucket " + bucketName);
+        log.debug("Copying objects from {} to {} from bucket {}", filePath, newPath, bucketName);
         try {
             minioClient.copyObject(
                     CopyObjectArgs.builder()
@@ -140,7 +134,7 @@ public class MinioS3Impl implements StorageS3 {
         for (var obj : deleteResults) {
             try {
                 var error = obj.get();
-                log.warn("Error in deleting object " + error.objectName() + "; " + error.message());
+                log.debug("Error in deleting object {}; {}", error.objectName(), error.message());
             } catch (Exception e) {
                 throw new StorageServerException(e.getMessage());
             }

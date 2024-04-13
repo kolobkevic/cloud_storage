@@ -2,7 +2,6 @@ package ru.kolobkevic.cloud_storage.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/storage")
-@Slf4j
 public class StorageController {
     private final StorageService storageService;
     private final RedirectUtils redirectUtils;
@@ -45,7 +43,6 @@ public class StorageController {
                            @RequestParam(value = "path", required = false, defaultValue = "") String path,
                            Model model) throws StorageServerException, StorageObjectNotFoundException {
 
-        log.info("Path: " + path);
         model.addAttribute("breadCrumbsList", storageService.getBreadCrumb(path));
         model.addAttribute("files", storageService.getListOfObjects(user.getUsername(),
                 path, false));
