@@ -24,6 +24,7 @@ public class AuthController {
     private final UserService userService;
     private final StorageService storageService;
     private static final String REGISTRATION_PAGE = "auth/registration";
+    private static final String LOGIN_PAGE = "auth/login";
 
     @GetMapping("/registration")
     public String showRegistrationPage(Model model) {
@@ -35,6 +36,7 @@ public class AuthController {
     public String register(@ModelAttribute("user") @Valid User user, BindingResult bindingResult)
             throws StorageServerException {
         if (bindingResult.hasErrors()) {
+            log.info(bindingResult.getAllErrors().toString());
             return REGISTRATION_PAGE;
         }
 
@@ -47,11 +49,11 @@ public class AuthController {
                     "User with this email already exists");
             return REGISTRATION_PAGE;
         }
-        return "redirect:auth/login";
+        return "redirect:" + LOGIN_PAGE;
     }
 
     @GetMapping("/login")
     public String showLoginPage() {
-        return "auth/login";
+        return LOGIN_PAGE;
     }
 }
