@@ -32,14 +32,13 @@ public class MinioS3Impl implements StorageS3 {
     private final MinioClient minioClient;
     private final MinioProperties minioProperties;
 
-    private final String bucketName = minioProperties.getBucket();
     private static final int PART_SIZE = 104857600;
 
     private Iterable<Result<Item>> getObjects(String objectName, boolean isRecursive) {
-        log.debug("Getting list of objects with name {} from bucket {}", objectName, bucketName);
+        log.debug("Getting list of objects with name {} from bucket {}", objectName, minioProperties.getBucket());
         return minioClient.listObjects(
                 ListObjectsArgs.builder()
-                        .bucket(bucketName)
+                        .bucket(minioProperties.getBucket())
                         .prefix(objectName)
                         .recursive(isRecursive)
                         .build());
@@ -76,10 +75,10 @@ public class MinioS3Impl implements StorageS3 {
 
     @Override
     public void uploadObject(String filePath, InputStream in) throws StorageServerException {
-        log.debug("Uploading objects with name {} from bucket {}", filePath, bucketName);
+        log.debug("Uploading objects with name {} from bucket {}", filePath, minioProperties.getBucket());
         try {
             minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(minioProperties.getBucket())
                     .object(filePath)
                     .stream(in, -1, PART_SIZE)
                     .build());
@@ -90,10 +89,10 @@ public class MinioS3Impl implements StorageS3 {
 
     @Override
     public void createFolder(String filePath) throws StorageServerException {
-        log.debug("Creating folder with name {} from bucket {}", filePath, bucketName);
+        log.debug("Creating folder with name {} from bucket {}", filePath, minioProperties.getBucket());
         try {
             minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(minioProperties.getBucket())
                     .object(filePath)
                     .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
                     .build());
@@ -104,15 +103,15 @@ public class MinioS3Impl implements StorageS3 {
 
     @Override
     public void copyObject(String filePath, String newPath) throws StorageServerException {
-        log.debug("Copying objects from {} to {} from bucket {}", filePath, newPath, bucketName);
+        log.debug("Copying objects from {} to {} from bucket {}", filePath, newPath, minioProperties.getBucket());
         try {
             minioClient.copyObject(
                     CopyObjectArgs.builder()
-                            .bucket(bucketName)
+                            .bucket(minioProperties.getBucket())
                             .object(newPath)
                             .source(
                                     CopySource.builder()
-                                            .bucket(bucketName)
+                                            .bucket(minioProperties.getBucket())
                                             .object(filePath)
                                             .build())
                             .build());
@@ -127,7 +126,7 @@ public class MinioS3Impl implements StorageS3 {
 
         var deleteResults = minioClient.removeObjects(
                 RemoveObjectsArgs.builder()
-                        .bucket(bucketName)
+                        .bucket(minioProperties.getBucket())
                         .objects(objects)
                         .build());
 
@@ -144,7 +143,7 @@ public class MinioS3Impl implements StorageS3 {
     @Override
     public ByteArrayResource downloadObject(String filePath) throws StorageServerException {
         GetObjectArgs objectArgs = GetObjectArgs.builder()
-                .bucket(bucketName)
+                .bucket(minioProperties.getBucket())
                 .object(filePath)
                 .build();
         try (var object = minioClient.getObject(objectArgs)) {
