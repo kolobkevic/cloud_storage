@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.util.List;
 
 @Component
-public interface StorageDAO {
+public interface StorageS3 {
     List<StorageObject> getListOfObjects(String objectName, boolean isRecursive) throws StorageServerException, StorageObjectNotFoundException;
 
     void uploadObject(String filePath, InputStream in) throws StorageServerException;
