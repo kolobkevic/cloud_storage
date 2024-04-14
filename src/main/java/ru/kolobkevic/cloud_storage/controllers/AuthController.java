@@ -44,7 +44,7 @@ public class AuthController {
             userService.create(user);
             storageService.createUserFolder(user.getEmail());
         } catch (UserAlreadyExistsException e) {
-            log.debug("Sign up failed for user " + user.getEmail());
+            log.debug("Sign up failed for user {}", user.getEmail());
             bindingResult.rejectValue("email", "user already exists",
                     "User with this email already exists");
             return REGISTRATION_PAGE;
