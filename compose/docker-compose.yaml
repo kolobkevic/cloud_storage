@@ -11,7 +11,9 @@ services:
 
   minio:
     image: minio/minio:latest
-    command: server --console-address ":9001" /data/
+    command: server /data/
+    volumes:
+      - ~/data/minio:/data
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -20,6 +22,7 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+
   redis:
     container_name: redis
     image: redis:latest

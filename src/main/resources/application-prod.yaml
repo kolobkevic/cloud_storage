@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:mysql://mysqldb:3306/clouddb
+    username: clouduser
+    password: secret
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+minio:
+  url: http://minio:9001
+  bucket: cloud-storage
+  access-key: minioadmin
+  secret-key: minioadmin
+  port: 9000

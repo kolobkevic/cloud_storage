@@ -10,7 +10,7 @@
     </parent>
     <groupId>ru.kolobkevic</groupId>
     <artifactId>cloud_storage</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>cloud_storage</name>
     <description>cloud_storage</description>
     <properties>
