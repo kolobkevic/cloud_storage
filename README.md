@@ -47,9 +47,19 @@ cd ./cloud_storage/compose
 ```
 3. Собрать и запустить с помощью докера
 ```shell
-docker-compose -f docker-compose.yaml up
+docker-compose -f compose/docker-compose.yaml up
 ```
-4. Открыть в браузере
+4. Запустить приложение
+для Windows:
+```shell
+./mvnw.cmd spring-boot:run
+```
+для MacOS и Linux
+```shell
+./mvnw spring-boot:run
+```
+5. Открыть в браузере
 ```shell
 http://localhost:8080/
 ```
+6. Зарегистрироваться и авторизоваться
